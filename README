@@ -1,0 +1,20 @@
+tintwizard 0.1.3b (23rd June 2009)
+
+Thank you for downloading tintwizard!
+
+See http://code.google.com/p/tintwizard/ for more information
+
+See http://code.google.com/p/tintwizard/wiki/Help for help
+
+To run tintwizard, navigate to the folder where tintwizard.py was
+extracted to and double click on the file. Alternatively use a
+terminal to navigate to this location and type ./tintwizard.py
+to run. If neither of these work you may have to change
+permissions to allow it to run.
+
+chmod +x tintwizard.py
+
+should do the trick.
+
+Please report any problems by posting a bug report at 
+http://code.google.com/p/tintwizard/issues/entry
