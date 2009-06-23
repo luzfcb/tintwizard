@@ -226,7 +226,7 @@ class TintWizardGUI(gtk.Window):
 		
 		self.table = gtk.Table(2, 1, False)
 		
-		# Create menus
+		# Create menus and toolbar items
 		ui = """
 		<ui>
 			<menubar name="MenuBar">
@@ -242,6 +242,7 @@ class TintWizardGUI(gtk.Window):
 				<menu action="Tint2">
 					<menuitem action="OpenDefault" />
 					<menuitem action="SaveDefault" />
+					<separator />
 					<menuitem action="Apply" />
 				</menu>
 				<menu action="Tools">
@@ -316,6 +317,7 @@ class TintWizardGUI(gtk.Window):
 		
 		self.bgs = []
 		
+		# Add buttons for adding/deleting background styles
 		temp = gtk.Button("New Background", gtk.STOCK_NEW)
 		temp.set_name("addBg")
 		temp.connect("clicked", self.addBgClick)
@@ -1508,17 +1510,17 @@ class TintWizardGUI(gtk.Window):
 			dialog.destroy()
 			
 			if response == gtk.RESPONSE_CANCEL:
-				return True
+				return True							# Return True to stop it quitting when we hit "Cancel"
 			elif response == gtk.RESPONSE_NO:
 				gtk.main_quit()
 			elif response == gtk.RESPONSE_YES:
-				self.save(None, None)
+				self.save()
 				gtk.main_quit()
 		else:
 			gtk.main_quit()
 	
 	def readConf(self):
-		"""Reads the tintwizard configuration file."""
+		"""Reads the tintwizard configuration file - NOT tint2 config files."""
 		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None, "dir": None}
 		
 		if os.path.dirname(sys.argv[0]) == ".":
@@ -1565,23 +1567,23 @@ class TintWizardGUI(gtk.Window):
 		
 		self.parseConfig(string)
 	
-	def refreshClicked(self, widget, event=None):
-		"""Refreshes the generated config and updates the preview."""
-		self.generateConfig()
-		
-		self.drawPreview()
-	
 	def save(self, widget=None, event=None):
 		"""Saves the generated config file."""
-		if self.filename == None:				# If no file has been selected, force the user to "Save As..."
-			return self.saveAs(None, None)
+		
+		# This function returns the boolean status of whether or not the
+		# file saved, so that the apply() function knows if it should
+		# kill the tint2 process and apply the new config.
+		
+		# If no file has been selected, force the user to "Save As..."
+		if self.filename == None:
+			return self.saveAs()
 		else:
 			self.generateConfig()
 			self.writeFile()
 			
 			return True
 	
-	def saveAs(self, widget, event=None):
+	def saveAs(self, widget=None, event=None):
 		"""Prompts the user to select a file and then saves the generated config file."""
 		self.generateConfig()
 		
@@ -1628,6 +1630,7 @@ class TintWizardGUI(gtk.Window):
 			self.filename = os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc"
 			self.curDir = os.path.expandvars("${HOME}") + "/.config/tint2"
 			
+			# If, for whatever reason, tint2 has no default config - create one.
 			if not os.path.isfile(self.filename):
 				f = open(self.filename, "w")
 				f.write("# tint2rc")
@@ -1645,13 +1648,14 @@ class TintWizardGUI(gtk.Window):
 	
 	def switchPage(self, notebook, page, page_num):
 		"""Handles notebook page switch events."""
+		
+		# If user selects the 'View Config' tab, update the textarea within this tab.
 		if notebook.get_tab_label_text(notebook.get_nth_page(page_num)) == "View Config":
 			self.generateConfig()
 	
 	def updateComboBoxes(self, i, action="add"):
 		"""Updates the contents of a combo box when a background style has been added/removed."""
 		cbs = [self.batteryBg, self.clockBg, self.taskbarBg, self.trayBg, self.taskActiveBg, self.taskBg, self.panelBg]
-		
 		
 		if action == "add":
 			for cb in cbs:
