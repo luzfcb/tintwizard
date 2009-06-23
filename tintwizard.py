@@ -12,7 +12,7 @@ import math
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.1.3b"
+VERSION = "0.1.4"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -174,7 +174,7 @@ class TintWizardGUI(gtk.Window):
 		self.curDir = None
 		self.toSave = False
 		
-		# Read conf file
+		# Read conf file and set default values
 		self.readConf()
 		
 		if self.defaults["bgColor"] in [None, "None"]:
@@ -220,11 +220,11 @@ class TintWizardGUI(gtk.Window):
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 		
 		self.set_title("tintwizard")
-		self.set_geometry_hints(min_width=660, min_height=300)
 		
 		self.connect("delete_event", self.quit)
 		
-		self.table = gtk.Table(2, 1, False)
+		# self.table is our main layout manager
+		self.table = gtk.Table(4, 1, False)
 		
 		# Create menus and toolbar items
 		ui = """
@@ -339,12 +339,14 @@ class TintWizardGUI(gtk.Window):
 		self.panelPosY.append_text("bottom")
 		self.panelPosY.append_text("top")
 		self.panelPosY.set_active(0)
+		self.panelPosY.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelPosY, 2, 3, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.panelPosX = gtk.combo_box_new_text()
 		self.panelPosX.append_text("left")
 		self.panelPosX.append_text("right")
 		self.panelPosX.append_text("center")
 		self.panelPosX.set_active(0)
+		self.panelPosX.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelPosX, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Size (x, y)")
@@ -353,10 +355,12 @@ class TintWizardGUI(gtk.Window):
 		self.panelSizeX = gtk.Entry(6)
 		self.panelSizeX.set_width_chars(8)
 		self.panelSizeX.set_text(PANEL_SIZE_X)
+		self.panelSizeX.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelSizeX, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		self.panelSizeY = gtk.Entry(6)
 		self.panelSizeY.set_width_chars(8)
 		self.panelSizeY.set_text(PANEL_SIZE_Y)
+		self.panelSizeY.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelSizeY, 2, 3, 1, 2, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Margin (x, y)")
@@ -365,10 +369,12 @@ class TintWizardGUI(gtk.Window):
 		self.panelMarginX = gtk.Entry(6)
 		self.panelMarginX.set_width_chars(8)
 		self.panelMarginX.set_text(PANEL_MARGIN_X)
+		self.panelMarginX.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelMarginX, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		self.panelMarginY = gtk.Entry(6)
 		self.panelMarginY.set_width_chars(8)
 		self.panelMarginY.set_text(PANEL_MARGIN_Y)
+		self.panelMarginY.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelMarginY, 2, 3, 2, 3, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Padding (x, y)")
@@ -377,10 +383,12 @@ class TintWizardGUI(gtk.Window):
 		self.panelPadX = gtk.Entry(6)
 		self.panelPadX.set_width_chars(8)
 		self.panelPadX.set_text(PANEL_PADDING_Y)
+		self.panelPadX.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelPadX, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		self.panelPadY = gtk.Entry(6)
 		self.panelPadY.set_width_chars(8)
 		self.panelPadY.set_text(PANEL_PADDING_Y)
+		self.panelPadY.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelPadY, 2, 3, 3, 4, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Panel Background ID")
@@ -391,6 +399,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.panelBg.append_text(str(i+1))
 		self.panelBg.set_active(0)
+		self.panelBg.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
@@ -399,6 +408,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelMonitor = gtk.Entry(6)
 		self.panelMonitor.set_width_chars(8)
 		self.panelMonitor.set_text(PANEL_MONITOR)
+		self.panelMonitor.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelMonitor, 1, 2, 5, 6, xoptions=gtk.EXPAND)
 		
 		# Taskbar
@@ -414,6 +424,7 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarMode.append_text("multi_desktop")
 		self.taskbarMode.append_text("single_monitor")
 		self.taskbarMode.set_active(0)
+		self.taskbarMode.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarMode, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Padding (x, y)")
@@ -422,10 +433,12 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarPadX = gtk.Entry(6)
 		self.taskbarPadX.set_width_chars(8)
 		self.taskbarPadX.set_text(TASKBAR_PADDING_X)
+		self.taskbarPadX.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarPadX, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		self.taskbarPadY = gtk.Entry(6)
 		self.taskbarPadY.set_width_chars(8)
 		self.taskbarPadY.set_text(TASKBAR_PADDING_Y)
+		self.taskbarPadY.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarPadY, 2, 3, 1, 2, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Taskbar Background ID")
@@ -436,6 +449,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.taskbarBg.append_text(str(i+1))
 		self.taskbarBg.set_active(0)
+		self.taskbarBg.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarBg, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Task Options
@@ -449,6 +463,7 @@ class TintWizardGUI(gtk.Window):
 		self.taskBlinks = gtk.Entry(6)
 		self.taskBlinks.set_width_chars(8)
 		self.taskBlinks.set_text(TASK_BLINKS)
+		self.taskBlinks.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskBlinks, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Show Text")
@@ -456,6 +471,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTask.attach(temp, 0, 1, 1, 2, xpadding=10)
 		self.taskTextCheckButton = gtk.CheckButton()
 		self.taskTextCheckButton.set_active(True)
+		self.taskTextCheckButton.connect("toggled", self.changeOccurred)
 		self.tableTask.attach(self.taskTextCheckButton, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Centre Text")
@@ -463,6 +479,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTask.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.taskCentreCheckButton = gtk.CheckButton()
 		self.taskCentreCheckButton.set_active(True)
+		self.taskCentreCheckButton.connect("toggled", self.changeOccurred)
 		self.tableTask.attach(self.taskCentreCheckButton, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Show Icon")
@@ -470,6 +487,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTask.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.taskIconCheckButton = gtk.CheckButton()
 		self.taskIconCheckButton.set_active(True)
+		self.taskIconCheckButton.connect("toggled", self.changeOccurred)
 		self.tableTask.attach(self.taskIconCheckButton, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Width")
@@ -478,6 +496,7 @@ class TintWizardGUI(gtk.Window):
 		self.taskWidth = gtk.Entry(6)
 		self.taskWidth.set_width_chars(8)
 		self.taskWidth.set_text(TASK_WIDTH)
+		self.taskWidth.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskWidth, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Padding (x, y)")
@@ -486,10 +505,12 @@ class TintWizardGUI(gtk.Window):
 		self.taskPadX = gtk.Entry(6)
 		self.taskPadX.set_width_chars(8)
 		self.taskPadX.set_text(TASK_PADDING_X)
+		self.taskPadX.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskPadX, 1, 2, 5, 6, xoptions=gtk.EXPAND)
 		self.taskPadY = gtk.Entry(6)
 		self.taskPadY.set_width_chars(8)
 		self.taskPadY.set_text(TASK_PADDING_Y)
+		self.taskPadY.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskPadY, 2, 3, 5, 6, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Horizontal Spacing")
@@ -498,6 +519,7 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarSpacing = gtk.Entry(6)
 		self.taskbarSpacing.set_width_chars(8)
 		self.taskbarSpacing.set_text(TASK_SPACING)
+		self.taskbarSpacing.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskbarSpacing, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Task Background ID")
@@ -508,6 +530,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.taskBg.append_text(str(i+1))
 		self.taskBg.set_active(0)
+		self.taskBg.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskBg, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Task Active Background ID")
@@ -518,6 +541,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.taskActiveBg.append_text(str(i+1))
 		self.taskActiveBg.set_active(0)
+		self.taskActiveBg.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskActiveBg, 1, 2, 8, 9, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Font Options
@@ -534,6 +558,7 @@ class TintWizardGUI(gtk.Window):
 			self.defaults["font"] = self.fontButton.get_font_name()		# Use the gtk default
 		
 		self.fontButton.set_font_name(self.defaults["font"])
+		self.fontButton.connect("font-set", self.changeOccurred)
 		self.tableFont.attach(self.fontButton, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Font Color")
@@ -550,6 +575,8 @@ class TintWizardGUI(gtk.Window):
 		self.fontColButton.connect("color-set", self.colorChange)
 		self.tableFont.attach(self.fontColButton, 2, 3, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.fontCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.fontCol.connect("changed", self.changeOccurred)
 		
 		temp = gtk.Label("Active Font Color")
 		temp.set_alignment(0, 0.5)
@@ -565,12 +592,15 @@ class TintWizardGUI(gtk.Window):
 		self.fontActiveColButton.connect("color-set", self.colorChange)
 		self.tableFont.attach(self.fontActiveColButton, 2, 3, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.fontActiveCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.fontActiveCol.connect("changed", self.changeOccurred)
 		
 		temp = gtk.Label("Font Shadow")
 		temp.set_alignment(0, 0.5)
 		self.tableFont.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.fontShadowCheckButton = gtk.CheckButton()
 		self.fontShadowCheckButton.set_active(False)
+		self.fontShadowCheckButton.connect("toggled", self.changeOccurred)
 		self.tableFont.attach(self.fontShadowCheckButton, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		
 		# Systray Options
@@ -583,6 +613,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTray.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.trayCheckButton = gtk.CheckButton()
 		self.trayCheckButton.set_active(True)
+		self.trayCheckButton.connect("toggled", self.changeOccurred)
 		self.tableTray.attach(self.trayCheckButton, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Padding (x, y)")
@@ -591,10 +622,12 @@ class TintWizardGUI(gtk.Window):
 		self.trayPadX = gtk.Entry(6)
 		self.trayPadX.set_width_chars(8)
 		self.trayPadX.set_text(TRAY_PADDING_X)
+		self.trayPadX.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.trayPadX, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		self.trayPadY = gtk.Entry(6)
 		self.trayPadY.set_width_chars(8)
 		self.trayPadY.set_text(TRAY_PADDING_Y)
+		self.trayPadY.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.trayPadY, 2, 3, 1, 2, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Horizontal Spacing")
@@ -603,6 +636,7 @@ class TintWizardGUI(gtk.Window):
 		self.traySpacing = gtk.Entry(6)
 		self.traySpacing.set_width_chars(8)
 		self.traySpacing.set_text(TRAY_SPACING)
+		self.traySpacing.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.traySpacing, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Systray Background ID")
@@ -613,6 +647,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.trayBg.append_text(str(i+1))
 		self.trayBg.set_active(0)
+		self.trayBg.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.trayBg, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Clock Options
@@ -625,6 +660,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableClock.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.clockCheckButton = gtk.CheckButton()
 		self.clockCheckButton.set_active(True)
+		self.clockCheckButton.connect("toggled", self.changeOccurred)
 		self.tableClock.attach(self.clockCheckButton, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Time 1 Format")
@@ -633,9 +669,11 @@ class TintWizardGUI(gtk.Window):
 		self.clock1Format = gtk.Entry(50)
 		self.clock1Format.set_width_chars(20)
 		self.clock1Format.set_text(CLOCK_FMT_1)
+		self.clock1Format.connect("changed", self.changeOccurred)
 		self.tableClock.attach(self.clock1Format, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		self.clock1CheckButton = gtk.CheckButton("Show")
 		self.clock1CheckButton.set_active(True)
+		self.clock1CheckButton.connect("toggled", self.changeOccurred)
 		self.tableClock.attach(self.clock1CheckButton, 2, 3, 1, 2, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Time 1 Font")
@@ -643,6 +681,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableClock.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.clock1FontButton = gtk.FontButton()
 		self.clock1FontButton.set_font_name(self.defaults["font"])
+		self.clock1FontButton.connect("font-set", self.changeOccurred)
 		self.tableClock.attach(self.clock1FontButton, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Time 2 Format")
@@ -651,9 +690,11 @@ class TintWizardGUI(gtk.Window):
 		self.clock2Format = gtk.Entry(50)
 		self.clock2Format.set_width_chars(20)
 		self.clock2Format.set_text(CLOCK_FMT_2)
+		self.clock2Format.connect("changed", self.changeOccurred)
 		self.tableClock.attach(self.clock2Format, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		self.clock2CheckButton = gtk.CheckButton("Show")
 		self.clock2CheckButton.set_active(True)
+		self.clock2CheckButton.connect("toggled", self.changeOccurred)
 		self.tableClock.attach(self.clock2CheckButton, 2, 3, 3, 4, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Time 2 Font")
@@ -661,6 +702,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableClock.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.clock2FontButton = gtk.FontButton()
 		self.clock2FontButton.set_font_name(self.defaults["font"])
+		self.clock2FontButton.connect("font-set", self.changeOccurred)
 		self.tableClock.attach(self.clock2FontButton, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Clock Font Color")
@@ -677,6 +719,8 @@ class TintWizardGUI(gtk.Window):
 		self.clockFontColButton.connect("color-set", self.colorChange)
 		self.tableClock.attach(self.clockFontColButton, 2, 3, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.clockFontCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.clockFontCol.connect("changed", self.changeOccurred)
 		
 		temp = gtk.Label("Padding (x, y)")
 		temp.set_alignment(0, 0.5)
@@ -684,10 +728,12 @@ class TintWizardGUI(gtk.Window):
 		self.clockPadX = gtk.Entry(6)
 		self.clockPadX.set_width_chars(8)
 		self.clockPadX.set_text(CLOCK_PADDING_X)
+		self.clockPadX.connect("changed", self.changeOccurred)
 		self.tableClock.attach(self.clockPadX, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		self.clockPadY = gtk.Entry(6)
 		self.clockPadY.set_width_chars(8)
 		self.clockPadY.set_text(CLOCK_PADDING_Y)
+		self.clockPadY.connect("changed", self.changeOccurred)
 		self.tableClock.attach(self.clockPadY, 2, 3, 6, 7, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Clock Background ID")
@@ -698,6 +744,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.clockBg.append_text(str(i+1))
 		self.clockBg.set_active(0)
+		self.clockBg.connect("changed", self.changeOccurred)
 		self.tableClock.attach(self.clockBg, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Mouse Options
@@ -716,6 +763,7 @@ class TintWizardGUI(gtk.Window):
 		self.mouseMiddle.append_text("shade")
 		self.mouseMiddle.append_text("toggle_iconify")
 		self.mouseMiddle.set_active(0)
+		self.mouseMiddle.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseMiddle, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Right Mouse Click Action")
@@ -729,6 +777,7 @@ class TintWizardGUI(gtk.Window):
 		self.mouseRight.append_text("shade")
 		self.mouseRight.append_text("toggle_iconify")
 		self.mouseRight.set_active(0)
+		self.mouseRight.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseRight, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Mouse Wheel Scroll Up Action")
@@ -742,6 +791,7 @@ class TintWizardGUI(gtk.Window):
 		self.mouseUp.append_text("shade")
 		self.mouseUp.append_text("toggle_iconify")
 		self.mouseUp.set_active(0)
+		self.mouseUp.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseUp, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Mouse Wheel Scroll Down Action")
@@ -755,6 +805,7 @@ class TintWizardGUI(gtk.Window):
 		self.mouseDown.append_text("shade")
 		self.mouseDown.append_text("toggle_iconify")
 		self.mouseDown.set_active(0)
+		self.mouseDown.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseDown, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Battery Options
@@ -767,6 +818,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableBattery.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.batteryCheckButton = gtk.CheckButton()
 		self.batteryCheckButton.set_active(False)
+		self.batteryCheckButton.connect("toggled", self.changeOccurred)
 		self.tableBattery.attach(self.batteryCheckButton, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Battery Low Status (%)")
@@ -775,6 +827,7 @@ class TintWizardGUI(gtk.Window):
 		self.batteryLow = gtk.Entry(6)
 		self.batteryLow.set_width_chars(8)
 		self.batteryLow.set_text(BATTERY_LOW)
+		self.batteryLow.connect("changed", self.changeOccurred)
 		self.tableBattery.attach(self.batteryLow, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Battery Low Action")
@@ -783,6 +836,7 @@ class TintWizardGUI(gtk.Window):
 		self.batteryLowAction = gtk.Entry(150)
 		self.batteryLowAction.set_width_chars(32)
 		self.batteryLowAction.set_text(BATTERY_ACTION)
+		self.batteryLowAction.connect("changed", self.changeOccurred)
 		self.tableBattery.attach(self.batteryLowAction, 1, 3, 2, 3, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Battery 1 Font")
@@ -790,6 +844,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableBattery.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.bat1FontButton = gtk.FontButton()
 		self.bat1FontButton.set_font_name(self.defaults["font"])
+		self.bat1FontButton.connect("font-set", self.changeOccurred)
 		self.tableBattery.attach(self.bat1FontButton, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Battery 2 Font")
@@ -797,6 +852,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableBattery.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.bat2FontButton = gtk.FontButton()
 		self.bat2FontButton.set_font_name(self.defaults["font"])
+		self.bat2FontButton.connect("font-set", self.changeOccurred)
 		self.tableBattery.attach(self.bat2FontButton, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Battery Font Color")
@@ -813,6 +869,8 @@ class TintWizardGUI(gtk.Window):
 		self.batteryFontColButton.connect("color-set", self.colorChange)
 		self.tableBattery.attach(self.batteryFontColButton, 2, 3, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.batteryFontCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.batteryFontCol.connect("changed", self.changeOccurred)
 		
 		temp = gtk.Label("Padding (x, y)")
 		temp.set_alignment(0, 0.5)
@@ -820,10 +878,12 @@ class TintWizardGUI(gtk.Window):
 		self.batteryPadX = gtk.Entry(6)
 		self.batteryPadX.set_width_chars(8)
 		self.batteryPadX.set_text(BATTERY_PADDING_X)
+		self.batteryPadX.connect("changed", self.changeOccurred)
 		self.tableBattery.attach(self.batteryPadX, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		self.batteryPadY = gtk.Entry(6)
 		self.batteryPadY.set_width_chars(8)
 		self.batteryPadY.set_text(BATTERY_PADDING_Y)
+		self.batteryPadY.connect("changed", self.changeOccurred)
 		self.tableBattery.attach(self.batteryPadY, 2, 3, 6, 7, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Battery Background ID")
@@ -834,6 +894,7 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.batteryBg.append_text(str(i+1))
 		self.batteryBg.set_active(0)
+		self.batteryBg.connect("changed", self.changeOccurred)
 		self.tableBattery.attach(self.batteryBg, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# View Config
@@ -844,7 +905,7 @@ class TintWizardGUI(gtk.Window):
 		
 		# Add backgrounds to notebooks
 		for i in range(self.defaults["bgCount"]):
-			self.addBgClick(None)
+			self.addBgClick(None, init=True)
 		
 		self.bgNotebook.set_current_page(0)
 		
@@ -864,6 +925,16 @@ class TintWizardGUI(gtk.Window):
 		
 		# Add notebook to window and show
 		self.table.attach(self.notebook, 0, 4, 2, 3, xpadding=5, ypadding=5)
+		
+		# Create and add the status bar to the bottom of the main window
+		self.statusBar = gtk.Statusbar()
+		self.statusBar.set_has_resize_grip(True)
+		self.updateStatusBar("New Config File [*]")
+		self.table.attach(self.statusBar, 0, 4, 3, 4)
+		
+		self.add(self.table)
+		
+		self.show_all()
 		
 		# Create our property dictionary. This holds the widgets which correspond to each property
 		self.propUI = {
@@ -910,9 +981,6 @@ class TintWizardGUI(gtk.Window):
 			"battery_background_id": self.batteryBg
 		}
 		
-		self.add(self.table)
-		self.show_all()
-		
 		self.generateConfig()
 		
 	def about(self, action=None):
@@ -937,6 +1005,7 @@ class TintWizardGUI(gtk.Window):
 		temp.set_width_chars(9)
 		temp.set_name("rounded")
 		temp.set_text(BG_ROUNDING)
+		temp.connect("changed", self.changeOccurred)
 		self.bgs[-1].attach(temp, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Background Color")
@@ -945,8 +1014,9 @@ class TintWizardGUI(gtk.Window):
 		temp = gtk.Entry(7)
 		temp.set_width_chars(9)
 		temp.set_name("bgColEntry")
-		temp.connect("activate", self.colorTyped)
 		temp.set_text(self.defaults["bgColor"])
+		temp.connect("changed", self.changeOccurred)
+		temp.connect("activate", self.colorTyped)
 		self.bgs[-1].attach(temp, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 		temp = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["bgColor"]))
 		temp.set_use_alpha(True)
@@ -961,6 +1031,7 @@ class TintWizardGUI(gtk.Window):
 		temp.set_width_chars(9)
 		temp.set_name("border")
 		temp.set_text(BG_BORDER)
+		temp.connect("changed", self.changeOccurred)
 		self.bgs[-1].attach(temp, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Border Color")
@@ -971,6 +1042,7 @@ class TintWizardGUI(gtk.Window):
 		temp.set_name("borderColEntry")
 		temp.connect("activate", self.colorTyped)
 		temp.set_text(self.defaults["borderColor"])
+		temp.connect("changed", self.changeOccurred)
 		self.bgs[-1].attach(temp, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		temp = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["borderColor"]))
 		temp.set_use_alpha(True)
@@ -978,7 +1050,9 @@ class TintWizardGUI(gtk.Window):
 		temp.connect("color-set", self.colorChange)
 		self.bgs[-1].attach(temp, 2, 3, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 	
-	def addBgClick(self, widget=None):
+	# Note: Only set init to True when initialising background styles.
+	# This prevents unwanted calls to changeOccurred()
+	def addBgClick(self, widget=None, init=False):
 		"""Creates a new background and adds a new tab to the notebook."""
 		n = self.bgNotebook.get_n_pages()
 		
@@ -997,6 +1071,9 @@ class TintWizardGUI(gtk.Window):
 		self.updateComboBoxes(n, "add")
 		
 		self.bgNotebook.set_current_page(n)
+		
+		if not init:
+			self.changeOccurred()
 	
 	def apply(self, widget, event=None):
 		"""Applies the current config to tint2."""
@@ -1038,12 +1115,46 @@ class TintWizardGUI(gtk.Window):
 		dialog.destroy()
 		
 		self.generateConfig()
+		self.changeOccurred()
 	
 	def changeDefaults(self, widget=None):
 		"""Shows the style preferences widget."""
 		TintWizardPrefGUI(self)
 	
-	def colorChange(self, widget, event=None):
+	def changeOccurred(self, widget=None):
+		"""Called when the user changes something, i.e. entry value"""
+		self.toSave = True
+		
+		self.updateStatusBar(change=True)
+	
+	def colorButtonLookup(self, widget):
+		"""Returns the color button associated with widget."""
+		if widget.get_name() == "fontCol":
+			return self.fontColButton
+		elif widget.get_name() == "fontActiveCol":
+			return self.fontActiveColButton
+		elif widget.get_name() == "clockFontCol":
+			return self.clockFontColButton
+		elif widget.get_name() == "batteryFontCol":
+			return self.batteryFontColButton
+		elif widget.get_name() == "bgColEntry":
+			bgID = self.bgNotebook.get_current_page()
+			
+			for child in self.bgs[bgID].get_children():
+				if child.get_name() == "bgCol":
+					
+					return child
+		elif widget.get_name() == "borderColEntry":
+			bgID = self.bgNotebook.get_current_page()
+			
+			for child in self.bgs[bgID].get_children():
+				if child.get_name() == "borderCol":
+					
+					return child
+		
+		return None
+	
+	def colorChange(self, widget):
 		"""Update the text entry when a color button is updated."""
 		r = widget.get_color().red
 		g = widget.get_color().green
@@ -1073,49 +1184,44 @@ class TintWizardGUI(gtk.Window):
 					
 					child.set_text(rgbToHex(r, g, b))
 					break
+		
+		self.changeOccurred()
 	
 	def colorTyped(self, widget):
 		"""Update the color button when a valid value is typed into the entry."""
 		s = widget.get_text()
 		
+		# The color button associated with this widget.
+		colorButton = self.colorButtonLookup(widget)
+		
+		# Just a precautionary check - this situation should never arise.
+		if not colorButton:
+			print "Error in colorTyped() -- unrecognised entry widget."
+			return
+		
+		# If the entered value is invalid, set textbox to the current
+		# hex value of the associated color button.
+		buttonHex = self.getHexFromWidget(colorButton)
+		
 		if len(s) != 7:
 			errorDialog(self, "Invalid color specification!")
-			self.colorChange(widget)
+			#self.colorChange(widget) TODO - remove this when issue 29 is verified
+			widget.set_text(buttonHex)
 			return
 		
 		try:
 			col = gtk.gdk.Color(s)
 		except:
 			errorDialog(self, "Invalid color specification!")
-			self.colorChange(widget)
+			#self.colorChange(widget) TODO - remove this when issue 29 is verified
+			widget.set_text(buttonHex)
 			return
 		
-		if widget.get_name() == "fontCol":
-			self.fontColButton.set_color(col)
-		elif widget.get_name() == "fontActiveCol":
-			self.fontActiveColButton.set_color(col)
-		elif widget.get_name() == "clockFontCol":
-			self.clockFontColButton.set_color(col)
-		elif widget.get_name() == "batteryFontCol":
-			self.batteryFontColButton.set_color(col)
-		elif widget.get_name() == "bgColEntry":
-			bgID = self.bgNotebook.get_current_page()
-			
-			for child in self.bgs[bgID].get_children():
-				if child.get_name() == "bgCol":
-					
-					child.set_color(col)
-					break
-		elif widget.get_name() == "borderColEntry":
-			bgID = self.bgNotebook.get_current_page()
-			
-			for child in self.bgs[bgID].get_children():
-				if child.get_name() == "borderCol":
-					
-					child.set_color(col)
-					break
+		colorButton.set_color(col)
 	
-	def delBgClick(self, widget=None, prompt=True):
+	# Note: only set init to True when removing backgrounds for a new config
+	# This prevents unwanted calls to changeOccurred()
+	def delBgClick(self, widget=None, prompt=True, init=False):
 		"""Deletes the selected background after confirming with the user."""
 		selected = self.bgNotebook.get_current_page()
 		
@@ -1135,6 +1241,9 @@ class TintWizardGUI(gtk.Window):
 		self.bgNotebook.show_all()
 		
 		self.updateComboBoxes(len(self.bgs) + 1, "remove")
+		
+		if not init:
+			self.changeOccurred()
 	
 	def generateConfig(self):
 		"""Reads values from each widget and generates a config."""
@@ -1275,10 +1384,10 @@ class TintWizardGUI(gtk.Window):
 		
 		# Backgrounds
 		for i in range(len(self.bgs)):
-			self.delBgClick(prompt=False)
+			self.delBgClick(prompt=False, init=True)
 			
 		for i in range(self.defaults["bgCount"]):
-			self.addBgClick()
+			self.addBgClick(init=True)
 		
 		self.bgNotebook.set_current_page(0)
 		
@@ -1357,6 +1466,7 @@ class TintWizardGUI(gtk.Window):
 		self.batteryBg.set_active(0)
 		
 		self.generateConfig()
+		self.updateStatusBar("New Config File [*]")
 	
 	def openDef(self, widget=None):
 		"""Opens the default tint2 config."""
@@ -1395,6 +1505,7 @@ class TintWizardGUI(gtk.Window):
 		
 		self.readFile()
 		self.generateConfig()
+		self.updateStatusBar()
 	
 	def parseBgs(self, string):
 		"""Parses the background definitions from a string."""
@@ -1524,7 +1635,7 @@ class TintWizardGUI(gtk.Window):
 		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None, "dir": None}
 		
 		if os.path.dirname(sys.argv[0]) == ".":
-			pathName = ""
+			pathName = "."
 		else:
 			pathName = os.path.dirname(sys.argv[0])
 		
@@ -1667,6 +1778,19 @@ class TintWizardGUI(gtk.Window):
 				
 				cb.remove_text(i)
 	
+	def updateStatusBar(self, message="", change=False):
+		"""Updates the message on the statusbar. A message can be provided,
+		and if change is set to True (i.e. something has been modified) then
+		an appropriate symbol [*] is shown beside filename."""
+		contextID = self.statusBar.get_context_id("")
+		
+		self.statusBar.pop(contextID)
+		
+		if not message:
+			message = "%s %s" % (self.filename or "New Config File", "[*]" if change else "")
+		
+		self.statusBar.push(contextID, message)
+	
 	def writeConf(self):
 		"""Writes the tintwizard configuration file."""
 		confStr = "#Start\n[defaults]\n"
@@ -1699,6 +1823,8 @@ class TintWizardGUI(gtk.Window):
 			self.toSave = False
 			
 			self.curDir = os.path.dirname(self.filename)
+			
+			self.updateStatusBar()
 		except IOError:
 			errorDialog(self, "Could not save file")
 

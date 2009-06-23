@@ -1,0 +1,22 @@
+23rd July 2009 - Revision 113 - Euan Freeman
+  - Added statusbar widget. At the moment it displays filename of config being edited, and displays an asterisk symbol if the user changes the config since the last open/save
+
+  - Connected "changed" / "toggled" / "font-set" events to every widget the user can edit. These all call the changeOccurred() method, which updates the statusbar and sets the variable toSave to True.
+
+  - Fixed a bug where when the user types an invalid hex value, it still tried to update the color button. In solving this, I changed the way in which the program fetches the color button corresponding to the text entry field.
+  
+  - Fixed a bug where, if launching from the same directory as the app is located in, it searches for "/tintwizard.conf" rather than "./tintwizard.conf". This bug still needs verification, but I think it has been fixed.
+  
+  - Removed code which sets the minimum size of the window. It's better to let GTK handle this itself.
+  
+  - Updated row count in constructor for the layout "table" in __init__ method of the TintWizardGUI class. This doesn't really matter, since the table object updates itself anyway.
+  
+23rd July 2009 - Revision 112 - Euan Freeman
+  - Removed the no longer needed refresh() method from the TintWizardGUI class.
+  
+  - Added separator to the Tint2 menu, just above the "Apply" menu item.
+  
+  - Added / modified some documentation
+  
+23rd July 2009 - Revision 111 - Euan Freeman
+  - Initial import to svn repository.
