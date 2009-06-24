@@ -1,4 +1,15 @@
-23rd July 2009 - Revision 113 - Euan Freeman
+24th June 2009 - Revision 114 - Euan Freeman
+  - Extracted code which searches for label matching a color button, placed in new method (getColorLabel)
+  
+  - Renamed colorButtonLookup to getColorButton
+  
+  - Minor documentation changes
+  
+  - Changed the way background styles are parsed from tint2 config files. The original method was quite large so split this into two functions.
+  
+  - Renamed readFile to readTint2Config to clear up any confusion
+  
+23rd June 2009 - Revision 113 - Euan Freeman
   - Added statusbar widget. At the moment it displays filename of config being edited, and displays an asterisk symbol if the user changes the config since the last open/save
 
   - Connected "changed" / "toggled" / "font-set" events to every widget the user can edit. These all call the changeOccurred() method, which updates the statusbar and sets the variable toSave to True.
@@ -11,12 +22,12 @@
   
   - Updated row count in constructor for the layout "table" in __init__ method of the TintWizardGUI class. This doesn't really matter, since the table object updates itself anyway.
   
-23rd July 2009 - Revision 112 - Euan Freeman
+23rd June 2009 - Revision 112 - Euan Freeman
   - Removed the no longer needed refresh() method from the TintWizardGUI class.
   
   - Added separator to the Tint2 menu, just above the "Apply" menu item.
   
   - Added / modified some documentation
   
-23rd July 2009 - Revision 111 - Euan Freeman
+23rd June 2009 - Revision 111 - Euan Freeman
   - Initial import to svn repository.

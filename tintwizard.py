@@ -1127,63 +1127,19 @@ class TintWizardGUI(gtk.Window):
 		
 		self.updateStatusBar(change=True)
 	
-	def colorButtonLookup(self, widget):
-		"""Returns the color button associated with widget."""
-		if widget.get_name() == "fontCol":
-			return self.fontColButton
-		elif widget.get_name() == "fontActiveCol":
-			return self.fontActiveColButton
-		elif widget.get_name() == "clockFontCol":
-			return self.clockFontColButton
-		elif widget.get_name() == "batteryFontCol":
-			return self.batteryFontColButton
-		elif widget.get_name() == "bgColEntry":
-			bgID = self.bgNotebook.get_current_page()
-			
-			for child in self.bgs[bgID].get_children():
-				if child.get_name() == "bgCol":
-					
-					return child
-		elif widget.get_name() == "borderColEntry":
-			bgID = self.bgNotebook.get_current_page()
-			
-			for child in self.bgs[bgID].get_children():
-				if child.get_name() == "borderCol":
-					
-					return child
-		
-		return None
-	
 	def colorChange(self, widget):
 		"""Update the text entry when a color button is updated."""
 		r = widget.get_color().red
 		g = widget.get_color().green
 		b = widget.get_color().blue
 		
-		if widget.get_name() == "fontCol":
-			self.fontCol.set_text(rgbToHex(r, g, b))
-		elif widget.get_name() == "fontActiveCol":
-			self.fontActiveCol.set_text(rgbToHex(r, g, b))
-		elif widget.get_name() == "clockFontCol":
-			self.clockFontCol.set_text(rgbToHex(r, g, b))
-		elif widget.get_name() == "batteryFontCol":
-			self.batteryFontCol.set_text(rgbToHex(r, g, b))
-		elif widget.get_name() == "bgCol":
-			bgID = self.bgNotebook.get_current_page()
-			
-			for child in self.bgs[bgID].get_children():
-				if child.get_name() == "bgColEntry":
-					
-					child.set_text(rgbToHex(r, g, b))
-					break
-		elif widget.get_name() == "borderCol":
-			bgID = self.bgNotebook.get_current_page()
-			
-			for child in self.bgs[bgID].get_children():
-				if child.get_name() == "borderColEntry":
-					
-					child.set_text(rgbToHex(r, g, b))
-					break
+		label = self.getColorLabel(widget)
+		
+		# No label found
+		if not label:
+			return
+		
+		label.set_text(rgbToHex(r, g, b))
 		
 		self.changeOccurred()
 	
@@ -1192,7 +1148,7 @@ class TintWizardGUI(gtk.Window):
 		s = widget.get_text()
 		
 		# The color button associated with this widget.
-		colorButton = self.colorButtonLookup(widget)
+		colorButton = self.getColorButton(widget)
 		
 		# Just a precautionary check - this situation should never arise.
 		if not colorButton:
@@ -1355,6 +1311,62 @@ class TintWizardGUI(gtk.Window):
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# End of config")
 	
+	def getColorButton(self, widget):
+		"""Returns the color button associated with widget."""
+		if widget.get_name() == "fontCol":
+			return self.fontColButton
+		elif widget.get_name() == "fontActiveCol":
+			return self.fontActiveColButton
+		elif widget.get_name() == "clockFontCol":
+			return self.clockFontColButton
+		elif widget.get_name() == "batteryFontCol":
+			return self.batteryFontColButton
+		elif widget.get_name() == "bgColEntry":
+			bgID = self.bgNotebook.get_current_page()
+			
+			for child in self.bgs[bgID].get_children():
+				if child.get_name() == "bgCol":
+					
+					return child
+		elif widget.get_name() == "borderColEntry":
+			bgID = self.bgNotebook.get_current_page()
+			
+			for child in self.bgs[bgID].get_children():
+				if child.get_name() == "borderCol":
+					
+					return child
+		
+		# No button found which matches label
+		return None
+	
+	def getColorLabel(self, widget):
+		"""Gets the color label associated with a color button."""
+		if widget.get_name() == "fontCol":
+			return self.fontCol
+		elif widget.get_name() == "fontActiveCol":
+			return self.fontActiveCol
+		elif widget.get_name() == "clockFontCol":
+			return self.clockFontCol
+		elif widget.get_name() == "batteryFontCol":
+			return self.batteryFontCol
+		elif widget.get_name() == "bgCol":
+			bgID = self.bgNotebook.get_current_page()
+			
+			for child in self.bgs[bgID].get_children():
+				if child.get_name() == "bgColEntry":
+					
+					return child
+		elif widget.get_name() == "borderCol":
+			bgID = self.bgNotebook.get_current_page()
+			
+			for child in self.bgs[bgID].get_children():
+				if child.get_name() == "borderColEntry":
+					
+					return child
+		
+		# No label found which matches color button
+		return None
+	
 	def getHexFromWidget(self, widget):
 		"""Returns the #RRGGBB value of a widget."""
 		r = widget.get_color().red
@@ -1470,10 +1482,10 @@ class TintWizardGUI(gtk.Window):
 	
 	def openDef(self, widget=None):
 		"""Opens the default tint2 config."""
-		self.openFile(None, default=True)
+		self.openFile(default=True)
 	
 	def openFile(self, widget=None, default=False):
-		"""Reads from a config file."""
+		"""Reads from a config file. If default=True, open the tint2 default config."""
 		self.new()
 		
 		if not default:
@@ -1503,42 +1515,32 @@ class TintWizardGUI(gtk.Window):
 			self.filename = os.path.expandvars("$HOME/.config/tint2/tint2rc")
 			self.curDir = os.path.expandvars("$HOME/.config/tint2")
 		
-		self.readFile()
+		self.readTint2Config()
 		self.generateConfig()
 		self.updateStatusBar()
 	
-	def parseBgs(self, string):
-		"""Parses the background definitions from a string."""
-		s = string.split("\n")
-		
-		bgDefs = []
-		cur = -1
-		
-		for l in s:
-			if "rounded" in l:
-				bgDefs += [[l]]
-				cur += 1
-			elif "border_width" in l or "background_color" in l or "border_color" in l:
-				bgDefs[cur] += [l]
-		
+	def addBgDefs(self, bgDefs):
+		"""Add interface elements for a list of background style definitions. bgDefs
+		should be a list containing dictionaries with the following keys: rounded,
+		border_width, background_color, border_color"""
 		for d in bgDefs:
 			self.addBg()
 			
 			for child in self.bgs[-1].get_children():
 				if child.get_name() == "rounded":
-					child.set_text(d[0].split("=")[1].strip())
+					child.set_text(d["rounded"])
 				elif child.get_name() == "border":
-					child.set_text(d[1].split("=")[1].strip())
+					child.set_text(d["border_width"])
 				elif child.get_name() == "bgColEntry":
-					child.set_text(d[2].split("=")[1].strip().split(" ")[0].strip())
+					child.set_text(d["background_color"].split(" ")[0].strip())
 					child.activate()
 				elif child.get_name() == "borderColEntry":
-					child.set_text(d[3].split("=")[1].strip().split(" ")[0].strip())
+					child.set_text(d["border_color"].split(" ")[0].strip())
 					child.activate()
 				elif child.get_name() == "bgCol":
-					child.set_alpha(int(int(d[2].split("=")[1].strip().split(" ")[1].strip()) * 65535 / 100.0))
+					child.set_alpha(int(int(d["background_color"].split(" ")[1].strip()) * 65535 / 100.0))
 				elif child.get_name() == "borderCol":
-					child.set_alpha(int(int(d[3].split("=")[1].strip().split(" ")[1].strip()) * 65535 / 100.0))
+					child.set_alpha(int(int(d["border_color"].split(" ")[1].strip()) * 65535 / 100.0))
 			
 			newId = len(self.bgs)
 		
@@ -1549,6 +1551,29 @@ class TintWizardGUI(gtk.Window):
 			self.updateComboBoxes(newId-1, "add")
 		
 			self.bgNotebook.set_current_page(newId)
+	
+	def parseBgs(self, string):
+		"""Parses the background definitions from a string."""
+		s = string.split("\n")
+		
+		bgDefs = []
+		cur = -1
+		bgKeys = ["border_width", "background_color", "border_color"]
+		newString = ""
+		
+		for line in s:
+			data = [token.strip() for token in line.split("=")]
+			
+			if data[0] == "rounded":					# It may be considered bad practice to
+				bgDefs += [{"rounded": data[1]}]		# find each style definition with an
+			elif data[0] in bgKeys:						# arbitrary value, but tint2 does the same.
+				bgDefs[cur][data[0]] = data[1]			# This means that any existing configs must
+			else:										# start with 'rounded'.
+				newString += "%s\n" % line
+		
+		self.addBgDefs(bgDefs)
+		
+		return newString
 	
 	def parseConfig(self, string):
 		"""Parses the contents of a config file."""
@@ -1652,7 +1677,7 @@ class TintWizardGUI(gtk.Window):
 				if self.defaults.has_key(l[0].strip()):
 					self.defaults[l[0].strip()] = l[1].strip()
 					
-	def readFile(self):
+	def readTint2Config(self):
 		"""Reads in from a config file."""
 		f = open(self.filename, "r")
 		
@@ -1674,9 +1699,13 @@ class TintWizardGUI(gtk.Window):
 		for i in range(len(self.bgs)):
 			self.delBgClick(None, False)
 		
-		self.parseBgs(string)
+		# As we parse background definitions, we build a new string
+		# without the background related stuff. This means we don't
+		# have to read through background defs AGAIN when parsing
+		# the other stuff.
+		noBgDefs = self.parseBgs(string)
 		
-		self.parseConfig(string)
+		self.parseConfig(noBgDefs)
 	
 	def save(self, widget=None, event=None):
 		"""Saves the generated config file."""
