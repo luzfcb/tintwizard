@@ -1,3 +1,6 @@
+26th June 2009 - Revision 115 - Euan Freeman
+  - Version 0.2 release
+
 24th June 2009 - Revision 114 - Euan Freeman
   - Extracted code which searches for label matching a color button, placed in new method (getColorLabel)
   
