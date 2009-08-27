@@ -1,3 +1,8 @@
+27th August 2009 - Revision 124 - Euan Freeman
+  - Fixed problem reading/writing to tintwizard.conf
+  
+  - Made changes to README file
+
 26th June 2009 - Revision 115 - Euan Freeman
   - Version 0.2 release
 

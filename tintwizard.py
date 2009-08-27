@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Last modified: 26th August 09
+
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -12,7 +14,7 @@ import math
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.2"
+VERSION = "0.21"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -1659,16 +1661,16 @@ class TintWizardGUI(gtk.Window):
 		"""Reads the tintwizard configuration file - NOT tint2 config files."""
 		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None, "dir": None}
 		
-		if os.path.dirname(sys.argv[0]) == ".":
-			pathName = "."
-		else:
-			pathName = os.path.dirname(sys.argv[0])
+		pathName = os.path.dirname(sys.argv[0])
 		
-		if not os.path.exists(pathName + "/tintwizard.conf"):
+		if pathName != "":
+			pathName += "/"
+		
+		if not os.path.exists(pathName + "tintwizard.conf"):
 			self.writeConf()
 			return
 		
-		f = open(pathName + "/tintwizard.conf", "r")
+		f = open(pathName + "tintwizard.conf", "r")
 		
 		for line in f:
 			if "=" in line:
@@ -1829,12 +1831,12 @@ class TintWizardGUI(gtk.Window):
 		
 		confStr += "#End\n"
 		
-		pathName = "."
+		pathName = os.path.dirname(sys.argv[0])
 		
-		if os.path.dirname(sys.argv[0]) != ".":
-			pathName = os.path.dirname(sys.argv[0])
-		
-		f = open(pathName+"/tintwizard.conf", "w")
+		if pathName == "":
+			f = open("tintwizard.conf", "w")
+		else:
+			f = open(pathName+"/tintwizard.conf", "w")
 		
 		f.write(confStr)
 		
