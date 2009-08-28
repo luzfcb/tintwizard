@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 26th August 09
+# Last modified: 28th August 09
 
 import pygtk
 pygtk.require('2.0')
@@ -10,11 +10,12 @@ import sys
 import signal
 import webbrowser
 import math
+import shutil
 
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.21"
+VERSION = "0.22"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -404,14 +405,22 @@ class TintWizardGUI(gtk.Window):
 		self.panelBg.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
+		temp = gtk.Label("Window Manager Menu")
 		temp.set_alignment(0, 0.5)
 		self.tablePanel.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.panelMenu = gtk.CheckButton()
+		self.panelMenu.set_active(False)
+		self.panelMenu.connect("toggled", self.changeOccurred)
+		self.tablePanel.attach(self.panelMenu, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanel.attach(temp, 0, 1, 6, 7, xpadding=10)
 		self.panelMonitor = gtk.Entry(6)
 		self.panelMonitor.set_width_chars(8)
 		self.panelMonitor.set_text(PANEL_MONITOR)
 		self.panelMonitor.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMonitor, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelMonitor, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=4, columns=3, homogeneous=False)
@@ -945,6 +954,7 @@ class TintWizardGUI(gtk.Window):
 			"panel_size": (self.panelSizeX, self.panelSizeY),
 			"panel_margin": (self.panelMarginX, self.panelMarginY),
 			"panel_padding": (self.panelPadX, self.panelPadY),
+			"wm_menu": self.panelMenu,
 			"panel_background_id": self.panelBg,
 			"taskbar_mode": self.taskbarMode,
 			"taskbar_padding": (self.taskbarPadX, self.taskbarPadY, self.taskbarSpacing),
@@ -1077,11 +1087,13 @@ class TintWizardGUI(gtk.Window):
 		if not init:
 			self.changeOccurred()
 	
-	def apply(self, widget, event=None):
+	def apply(self, widget, event=None, confirmChange=True):
 		"""Applies the current config to tint2."""
 		if confirmDialog(self, "This will terminate all currently running instances of tint2 before applying config. Continue?") == gtk.RESPONSE_YES:
 			if not self.save():
 				return
+			
+			#shutil.copyfile(self.filename, self.filename+".backup")		# Create backup
 			
 			# Check if tint2 is running
 			procs = os.popen('pidof "tint2"')				# Check list of active processes for tint2
@@ -1098,6 +1110,18 @@ class TintWizardGUI(gtk.Window):
 			
 			# Lastly, start it
 			os.spawnv(os.P_NOWAIT, self.tint2Bin, [self.tint2Bin, "-c" + self.filename])
+			
+			if confirmChange and self.filename != (os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc") and confirmDialog(self, "Use this as default tint2 config?") == gtk.RESPONSE_YES:
+				tmp = self.filename
+				self.filename = os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc"
+				try:
+					shutil.copyfile(tmp, self.filename)
+				except shutil.Error:
+					pass
+			
+			#if confirmChange and confirmDialog(self, "Keep this config?") == gtk.RESPONSE_NO:
+			#	shutil.copyfile(self.filename+".backup", self.filename)		# Create backup
+			#	self.apply(widget, event, False)
 	
 	def changeAllFonts(self, widget):
 		"""Changes all fonts at once."""
@@ -1241,6 +1265,7 @@ class TintWizardGUI(gtk.Window):
 															self.panelMarginY.get_text() if self.panelMarginY.get_text() else PANEL_MARGIN_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_padding = %s %s\n" % (self.panelPadX.get_text() if self.panelPadX.get_text() else PANEL_PADDING_X,
 															self.panelPadY.get_text() if self.panelPadY.get_text() else PANEL_PADDING_Y))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "wm_menu = %s\n" % int(self.panelMenu.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_background_id = %s\n" % (self.panelBg.get_active()))
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Taskbar\n")
@@ -1388,14 +1413,8 @@ class TintWizardGUI(gtk.Window):
 		"""Enters the main loop."""
 		gtk.main()
 	
-	def new(self, action=None):
+	def resetConfig(self):
 		"""Resets all the widgets to their default values."""
-		if self.toSave:
-			self.savePrompt()
-		
-		self.toSave = True
-		self.filename = None
-		
 		# Backgrounds
 		for i in range(len(self.bgs)):
 			self.delBgClick(prompt=False, init=True)
@@ -1415,6 +1434,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelPadX.set_text(PANEL_PADDING_Y)
 		self.panelPadY.set_text(PANEL_PADDING_Y)
 		self.panelBg.set_active(0)
+		self.panelMenu.set_active(0)
 		self.panelMonitor.set_text(PANEL_MONITOR)
 		# Taskbar
 		self.taskbarMode.set_active(0)
@@ -1478,6 +1498,16 @@ class TintWizardGUI(gtk.Window):
 		self.batteryPadX.set_text(BATTERY_PADDING_Y)
 		self.batteryPadY.set_text(BATTERY_PADDING_Y)
 		self.batteryBg.set_active(0)
+	
+	def new(self, action=None):
+		"""Prepares a new config."""
+		if self.toSave:
+			self.savePrompt()
+		
+		self.toSave = True
+		self.filename = None
+		
+		self.resetConfig()
 		
 		self.generateConfig()
 		self.updateStatusBar("New Config File [*]")
@@ -1580,11 +1610,11 @@ class TintWizardGUI(gtk.Window):
 	def parseConfig(self, string):
 		"""Parses the contents of a config file."""
 		for line in string.split("\n"):
-			s = line.split("=")
+			s = line.split("=")												# Create a list with KEY and VALUE
 			
-			e = s[0].strip()
+			e = s[0].strip()												# Strip whitespace from KEY
 			
-			if e == "time1_format":
+			if e == "time1_format":											# Set the VALUE of KEY
 				self.parseProp(self.propUI[e], s[1], True, "time1")
 			elif e == "time2_format":
 				self.parseProp(self.propUI[e], s[1], True, "time2")
@@ -1596,10 +1626,10 @@ class TintWizardGUI(gtk.Window):
 	
 	def parseProp(self, prop, string, special=False, propType=""):
 		"""Parses a variable definition from the conf file and updates the correct UI widget."""
-		string = string.strip()
-		eType = type(prop)
+		string = string.strip()										# Remove whitespace from the VALUE
+		eType = type(prop)											# Get widget type
 		
-		if special:
+		if special:													# 'Special' properties are those which are optional
 			if propType == "time1":
 				self.clockCheckButton.set_active(True)
 				self.clock1CheckButton.set_active(True)
@@ -1632,9 +1662,9 @@ class TintWizardGUI(gtk.Window):
 			prop.set_font_name(string)
 		elif eType == gtk.ColorButton:
 			prop.set_alpha(int(int(string) * 65535 / 100.0))
-		elif eType == tuple:
-			s = string.split(" ")
-			for i in range(len(prop)):
+		elif eType == tuple:									# If a property has more than 1 value, for example the x and y co-ords
+			s = string.split(" ")								# of the padding properties, then just we use recursion to set the
+			for i in range(len(prop)):							# value of each associated widget.
 				self.parseProp(prop[i], s[i])
 	
 	def quit(self, widget, event=None):
@@ -1904,3 +1934,6 @@ def trunc(n):
 if __name__ == "__main__":
 	tw = TintWizardGUI()
 	tw.main()
+	
+	#import pdb
+	#pdb.run("tw.main()")

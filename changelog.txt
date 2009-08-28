@@ -1,3 +1,12 @@
+28th August 2009 - Revision 127 - Euan Freeman
+  - Added the wm_menu option
+  
+  - Refactored the 'new config' function
+  
+  - Added some documentation to code
+  
+  - When applying config to tint2, user has choice to use this as the default
+
 27th August 2009 - Revision 124 - Euan Freeman
   - Fixed problem reading/writing to tintwizard.conf
   
