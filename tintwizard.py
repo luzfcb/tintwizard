@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 28th August 09
+# Last modified: 30th August 09
 
 import pygtk
 pygtk.require('2.0')
@@ -15,7 +15,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.22"
+VERSION = "0.23"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -32,7 +32,8 @@ PANEL_MONITOR = "all"
 TASKBAR_PADDING_X = "0"
 TASKBAR_PADDING_Y = "0"
 TASK_BLINKS = "7"
-TASK_WIDTH = "200"
+TASK_MAXIMUM_SIZE_X = "200"
+TASK_MAXIMUM_SIZE_Y = "32"
 TASK_PADDING_X = "0"
 TASK_PADDING_Y = "0"
 TASK_SPACING = "0"
@@ -40,9 +41,11 @@ TRAY_PADDING_X = "0"
 TRAY_PADDING_Y = "0"
 TRAY_SPACING = "0"
 CLOCK_FMT_1 = "%H:%M"
-CLOCK_FMT_2 = "%A %d %B"
+CLOCK_FMT_2 = "%a %d %b"
 CLOCK_PADDING_X = "0"
 CLOCK_PADDING_Y = "0"
+CLOCK_LCLICK = ""
+CLOCK_RCLICK = ""
 BATTERY_LOW = "20"
 BATTERY_ACTION = 'notify-send "battery low"'
 BATTERY_PADDING_X = "0"
@@ -341,6 +344,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelPosY = gtk.combo_box_new_text()
 		self.panelPosY.append_text("bottom")
 		self.panelPosY.append_text("top")
+		self.panelPosY.append_text("center")
 		self.panelPosY.set_active(0)
 		self.panelPosY.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelPosY, 2, 3, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -352,75 +356,85 @@ class TintWizardGUI(gtk.Window):
 		self.panelPosX.connect("changed", self.changeOccurred)
 		self.tablePanel.attach(self.panelPosX, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Size (x, y)")
+		temp = gtk.Label("Panel Orientation")
 		temp.set_alignment(0, 0.5)
 		self.tablePanel.attach(temp, 0, 1, 1, 2, xpadding=10)
+		self.panelOrientation = gtk.combo_box_new_text()
+		self.panelOrientation.append_text("horizontal")
+		self.panelOrientation.append_text("vertical")
+		self.panelOrientation.set_active(0)
+		self.panelOrientation.connect("changed", self.changeOccurred)
+		self.tablePanel.attach(self.panelOrientation, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		self.panelSizeLabel = gtk.Label("Size (width, height)")
+		self.panelSizeLabel.set_alignment(0, 0.5)
+		self.tablePanel.attach(self.panelSizeLabel, 0, 1, 2, 3, xpadding=10)
 		self.panelSizeX = gtk.Entry(6)
 		self.panelSizeX.set_width_chars(8)
 		self.panelSizeX.set_text(PANEL_SIZE_X)
 		self.panelSizeX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelSizeX, 1, 2, 1, 2, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelSizeX, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		self.panelSizeY = gtk.Entry(6)
 		self.panelSizeY.set_width_chars(8)
 		self.panelSizeY.set_text(PANEL_SIZE_Y)
 		self.panelSizeY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelSizeY, 2, 3, 1, 2, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelSizeY, 2, 3, 2, 3, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Margin (x, y)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 2, 3, xpadding=10)
+		self.tablePanel.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.panelMarginX = gtk.Entry(6)
 		self.panelMarginX.set_width_chars(8)
 		self.panelMarginX.set_text(PANEL_MARGIN_X)
 		self.panelMarginX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMarginX, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelMarginX, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		self.panelMarginY = gtk.Entry(6)
 		self.panelMarginY.set_width_chars(8)
 		self.panelMarginY.set_text(PANEL_MARGIN_Y)
 		self.panelMarginY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMarginY, 2, 3, 2, 3, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelMarginY, 2, 3, 3, 4, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Padding (x, y)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.tablePanel.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.panelPadX = gtk.Entry(6)
 		self.panelPadX.set_width_chars(8)
 		self.panelPadX.set_text(PANEL_PADDING_Y)
 		self.panelPadX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelPadX, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelPadX, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		self.panelPadY = gtk.Entry(6)
 		self.panelPadY.set_width_chars(8)
 		self.panelPadY.set_text(PANEL_PADDING_Y)
 		self.panelPadY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelPadY, 2, 3, 3, 4, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelPadY, 2, 3, 4, 5, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Panel Background ID")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.tablePanel.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.panelBg = gtk.combo_box_new_text()
 		self.panelBg.append_text("0 (fully transparent)")
 		for i in range(len(self.bgs)):
 			self.panelBg.append_text(str(i+1))
 		self.panelBg.set_active(0)
 		self.panelBg.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelBg, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Window Manager Menu")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.tablePanel.attach(temp, 0, 1, 6, 7, xpadding=10)
 		self.panelMenu = gtk.CheckButton()
 		self.panelMenu.set_active(False)
 		self.panelMenu.connect("toggled", self.changeOccurred)
-		self.tablePanel.attach(self.panelMenu, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelMenu, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.tablePanel.attach(temp, 0, 1, 7, 8, xpadding=10)
 		self.panelMonitor = gtk.Entry(6)
 		self.panelMonitor.set_width_chars(8)
 		self.panelMonitor.set_text(PANEL_MONITOR)
 		self.panelMonitor.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMonitor, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		self.tablePanel.attach(self.panelMonitor, 1, 2, 7, 8, xoptions=gtk.EXPAND)
 		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=4, columns=3, homogeneous=False)
@@ -433,7 +447,6 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarMode = gtk.combo_box_new_text()
 		self.taskbarMode.append_text("single_desktop")
 		self.taskbarMode.append_text("multi_desktop")
-		self.taskbarMode.append_text("single_monitor")
 		self.taskbarMode.set_active(0)
 		self.taskbarMode.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarMode, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -501,14 +514,19 @@ class TintWizardGUI(gtk.Window):
 		self.taskIconCheckButton.connect("toggled", self.changeOccurred)
 		self.tableTask.attach(self.taskIconCheckButton, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Width")
+		temp = gtk.Label("Maximum Size (x, y)")
 		temp.set_alignment(0, 0.5)
 		self.tableTask.attach(temp, 0, 1, 4, 5, xpadding=10)
-		self.taskWidth = gtk.Entry(6)
-		self.taskWidth.set_width_chars(8)
-		self.taskWidth.set_text(TASK_WIDTH)
-		self.taskWidth.connect("changed", self.changeOccurred)
-		self.tableTask.attach(self.taskWidth, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		self.taskMaxSizeX = gtk.Entry(6)
+		self.taskMaxSizeX.set_width_chars(8)
+		self.taskMaxSizeX.set_text(TASK_MAXIMUM_SIZE_X)
+		self.taskMaxSizeX.connect("changed", self.changeOccurred)
+		self.tableTask.attach(self.taskMaxSizeX, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		self.taskMaxSizeY = gtk.Entry(6)
+		self.taskMaxSizeY.set_width_chars(8)
+		self.taskMaxSizeY.set_text(TASK_MAXIMUM_SIZE_Y)
+		self.taskMaxSizeY.connect("changed", self.changeOccurred)
+		self.tableTask.attach(self.taskMaxSizeY, 2, 3, 4, 5, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Padding (x, y)")
 		temp.set_alignment(0, 0.5)
@@ -758,6 +776,24 @@ class TintWizardGUI(gtk.Window):
 		self.clockBg.connect("changed", self.changeOccurred)
 		self.tableClock.attach(self.clockBg, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
+		temp = gtk.Label("Left Click Command")
+		temp.set_alignment(0, 0.5)
+		self.tableClock.attach(temp, 0, 1, 8, 9, xpadding=10)
+		self.clockLClick = gtk.Entry(50)
+		self.clockLClick.set_width_chars(20)
+		self.clockLClick.set_text(CLOCK_LCLICK)
+		self.clockLClick.connect("changed", self.changeOccurred)
+		self.tableClock.attach(self.clockLClick, 1, 2, 8, 9, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Right Click Command")
+		temp.set_alignment(0, 0.5)
+		self.tableClock.attach(temp, 0, 1, 9, 10, xpadding=10)
+		self.clockRClick = gtk.Entry(50)
+		self.clockRClick.set_width_chars(20)
+		self.clockRClick.set_text(CLOCK_RCLICK)
+		self.clockRClick.connect("changed", self.changeOccurred)
+		self.tableClock.attach(self.clockRClick, 1, 2, 9, 10, xoptions=gtk.EXPAND)
+		
 		# Mouse Options
 		self.tableMouse = gtk.Table(rows=4, columns=3, homogeneous=False)
 		self.tableMouse.set_row_spacings(5)
@@ -950,7 +986,7 @@ class TintWizardGUI(gtk.Window):
 		# Create our property dictionary. This holds the widgets which correspond to each property
 		self.propUI = {
 			"panel_monitor": self.panelMonitor,
-			"panel_position": (self.panelPosY, self.panelPosX),
+			"panel_position": (self.panelPosY, self.panelPosX, self.panelOrientation),
 			"panel_size": (self.panelSizeX, self.panelSizeY),
 			"panel_margin": (self.panelMarginX, self.panelMarginY),
 			"panel_padding": (self.panelPadX, self.panelPadY),
@@ -962,7 +998,7 @@ class TintWizardGUI(gtk.Window):
 			"task_icon": self.taskIconCheckButton,
 			"task_text": self.taskTextCheckButton,
 			"task_centered": self.taskCentreCheckButton,
-			"task_width": self.taskWidth,
+			"task_maximum_size": (self.taskMaxSizeX, self.taskMaxSizeY),
 			"task_padding": (self.taskPadX, self.taskPadY),
 			"task_background_id": self.taskBg,
 			"task_active_background_id": self.taskActiveBg,
@@ -979,6 +1015,8 @@ class TintWizardGUI(gtk.Window):
 			"clock_font_color": (self.clockFontCol, self.clockFontColButton),
 			"clock_padding": (self.clockPadX, self.clockPadY),
 			"clock_background_id": self.clockBg,
+			"clock_lclick_command": self.clockLClick,
+			"clock_rclick_command": self.clockRClick,
 			"mouse_middle": self.mouseMiddle,
 			"mouse_right": self.mouseRight,
 			"mouse_scroll_up": self.mouseUp,
@@ -1152,6 +1190,12 @@ class TintWizardGUI(gtk.Window):
 		self.toSave = True
 		
 		self.updateStatusBar(change=True)
+		
+		if widget == self.panelOrientation:
+			if self.panelOrientation.get_active_text() == "horizontal":
+				self.panelSizeLabel.set_text("Size (width, height)")
+			else:
+				self.panelSizeLabel.set_text("Size (height, width)")
 	
 	def colorChange(self, widget):
 		"""Update the text entry when a color button is updated."""
@@ -1258,7 +1302,7 @@ class TintWizardGUI(gtk.Window):
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "# Panel\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_monitor = %s\n" % (self.panelMonitor.get_text() if self.panelMonitor.get_text() else PANEL_MONITOR))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_position = %s %s\n" % (self.panelPosY.get_active_text(), self.panelPosX.get_active_text()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_position = %s %s %s\n" % (self.panelPosY.get_active_text(), self.panelPosX.get_active_text(), self.panelOrientation.get_active_text()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_size = %s %s\n" % (self.panelSizeX.get_text() if self.panelSizeX.get_text() else PANEL_SIZE_X,
 															self.panelSizeY.get_text() if self.panelSizeY.get_text() else PANEL_SIZE_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_margin = %s %s\n" % (self.panelMarginX.get_text() if self.panelMarginX.get_text() else PANEL_MARGIN_X,
@@ -1280,7 +1324,7 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_icon = %s\n" % int(self.taskIconCheckButton.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_text = %s\n" % int(self.taskTextCheckButton.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_centered = %s\n" % int(self.taskCentreCheckButton.get_active()))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "task_width = %s\n" % (self.taskWidth.get_text() if self.taskWidth.get_text() else TASK_WIDTH))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_maximum_size = %s %s\n" % (self.taskMaxSizeX.get_text() if self.taskMaxSizeX.get_text() else TASK_MAXIMUM_SIZE_X, self.taskMaxSizeY.get_text() if self.taskMaxSizeY.get_text() else TASK_MAXIMUM_SIZE_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_padding = %s %s\n" % (self.taskPadX.get_text() if self.taskPadX.get_text() else TASK_PADDING_X,
 															self.taskPadY.get_text() if self.taskPadY.get_text() else TASK_PADDING_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_background_id = %s\n" % (self.taskBg.get_active()))
@@ -1317,6 +1361,10 @@ class TintWizardGUI(gtk.Window):
 			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_padding = %s %s\n" % (self.clockPadX.get_text() if self.clockPadX.get_text() else CLOCK_PADDING_X,
 															self.clockPadY.get_text() if self.clockPadY.get_text() else CLOCK_PADDING_Y))
 			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_background_id = %s\n" % (self.clockBg.get_active()))
+			if self.clockLClick.get_text():
+				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_lclick_command = %s\n" % (self.clockLClick.get_text()))
+			if self.clockRClick.get_text():
+				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_rclick_command = %s\n" % (self.clockRClick.get_text()))
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Mouse\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "mouse_middle = %s\n" % (self.mouseMiddle.get_active_text()))
@@ -1427,6 +1475,7 @@ class TintWizardGUI(gtk.Window):
 		# Panel
 		self.panelPosY.set_active(0)
 		self.panelPosX.set_active(0)
+		self.panelOrientation.set_active(0)
 		self.panelSizeX.set_text(PANEL_SIZE_X)
 		self.panelSizeY.set_text(PANEL_SIZE_Y)
 		self.panelMarginX.set_text(PANEL_MARGIN_X)
@@ -1447,7 +1496,8 @@ class TintWizardGUI(gtk.Window):
 		self.taskCentreCheckButton.set_active(True)
 		self.taskTextCheckButton.set_active(True)
 		self.taskIconCheckButton.set_active(True)
-		self.taskWidth.set_text(TASK_WIDTH)
+		self.taskMaxSizeX.set_text(TASK_MAXIMUM_SIZE_X)
+		self.taskMaxSizeY.set_text(TASK_MAXIMUM_SIZE_Y)
 		self.taskPadX.set_text(TASK_PADDING_X)
 		self.taskPadY.set_text(TASK_PADDING_Y)
 		self.taskBg.set_active(0)
@@ -1481,6 +1531,8 @@ class TintWizardGUI(gtk.Window):
 		self.clockPadX.set_text(CLOCK_PADDING_X)
 		self.clockPadY.set_text(CLOCK_PADDING_Y)
 		self.clockBg.set_active(0)
+		self.clockLClick.set_text(CLOCK_LCLICK)
+		self.clockRClick.set_text(CLOCK_RCLICK)
 		# Mouse
 		self.mouseMiddle.set_active(0)
 		self.mouseRight.set_active(0)
@@ -1643,10 +1695,10 @@ class TintWizardGUI(gtk.Window):
 			prop.set_text(string)
 			prop.activate()
 		elif eType == gtk.ComboBox:
-			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor", "none", "close", "shade", "iconify", "toggle", "toggle_iconify"]:
-				if string in ["bottom", "left", "single_desktop", "none"]:
+			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor", "none", "close", "shade", "iconify", "toggle", "toggle_iconify", "horizontal", "vertical"]:
+				if string in ["bottom", "left", "single_desktop", "none", "horizontal"]:
 					i = 0
-				elif string in ["top", "right", "multi_desktop", "close"]:
+				elif string in ["top", "right", "multi_desktop", "close", "vertical"]:
 					i = 1
 				elif string in ["center", "single_monitor", "toggle"]:
 					i = 2

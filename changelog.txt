@@ -1,3 +1,18 @@
+30th August 2009 - Revision 130 - Euan Freeman
+  - Removed "single_monitor" option from "taskbar_mode"
+  
+  - Updated options available for "panel_pos" to include "horizontal" / "vertical"
+  
+  - Changed default clock2 format from "%A %d %B" to "%a %d %b"
+  
+  - Replaced "task_width" with "task_maximum_size"
+  
+  - The panel size label gets updated to either "Size (width, height)" or "Size (height, width)" depending on the orientation chosen.
+  
+  - Added link to http://code.google.com/p/tint2/ in README
+  
+  - Added the options "clock_lclick_command" and "clock_rclick_command"
+
 28th August 2009 - Revision 127 - Euan Freeman
   - Added the wm_menu option
   
