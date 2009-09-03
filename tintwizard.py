@@ -15,7 +15,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.24"
+VERSION = "0.2.5"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -752,16 +752,26 @@ class TintWizardGUI(gtk.Window):
 		self.traySpacing.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.traySpacing, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Systray Background ID")
+		temp = gtk.Label("Icon Ordering")
 		temp.set_alignment(0, 0.5)
 		self.tableTray.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.trayOrder = gtk.combo_box_new_text()
+		self.trayOrder.append_text("Ascending")
+		self.trayOrder.append_text("Descending")
+		self.trayOrder.set_active(0)
+		self.trayOrder.connect("changed", self.changeOccurred)
+		self.tableTray.attach(self.trayOrder, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Systray Background ID")
+		temp.set_alignment(0, 0.5)
+		self.tableTray.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.trayBg = gtk.combo_box_new_text()
 		self.trayBg.append_text("0 (fully transparent)")
 		for i in range(len(self.bgs)):
 			self.trayBg.append_text(str(i+1))
 		self.trayBg.set_active(0)
 		self.trayBg.connect("changed", self.changeOccurred)
-		self.tableTray.attach(self.trayBg, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tableTray.attach(self.trayBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Clock Options
 		self.tableClock = gtk.Table(rows=3, columns=3, homogeneous=False)
@@ -1118,6 +1128,7 @@ class TintWizardGUI(gtk.Window):
 			"font_shadow": self.fontShadowCheckButton,
 			"systray_padding": (self.trayPadX, self.trayPadY, self.traySpacing),
 			"systray_background_id": self.trayBg,
+			"systray_sort": self.trayOrder,
 			"time1_format": self.clock1Format,
 			"time2_format": self.clock2Format,
 			"time1_font": self.clock1FontButton,
@@ -1466,6 +1477,7 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_padding = %s %s %s\n" % (self.trayPadX.get_text() if self.trayPadX.get_text() else TRAY_PADDING_X,
 															self.trayPadY.get_text() if self.trayPadY.get_text() else TRAY_PADDING_Y,
 															self.traySpacing.get_text() if self.traySpacing.get_text() else TRAY_SPACING))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_sort = %s\n" % ("asc" if self.trayOrder.get_active() == 0 else "desc"))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_background_id = %s\n" % (self.trayBg.get_active()))
 		
 		if self.clockCheckButton.get_active():
@@ -1645,6 +1657,7 @@ class TintWizardGUI(gtk.Window):
 		self.trayPadX.set_text(TRAY_PADDING_X)
 		self.trayPadY.set_text(TRAY_PADDING_X)
 		self.traySpacing.set_text(TRAY_SPACING)
+		self.trayOrder.set_active(0)
 		self.trayBg.set_active(0)
 		# Clock
 		self.clockCheckButton.set_active(True)
@@ -1830,10 +1843,10 @@ class TintWizardGUI(gtk.Window):
 		elif eType == gtk.ComboBox:
 			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
 							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
-							"desktop_left", "desktop_right", "horizontal", "vertical"]:
-				if string in ["bottom", "left", "single_desktop", "none", "horizontal"]:
+							"desktop_left", "desktop_right", "horizontal", "vertical", "asc", "desc"]:
+				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "asc"]:
 					i = 0
-				elif string in ["top", "right", "multi_desktop", "close", "vertical"]:
+				elif string in ["top", "right", "multi_desktop", "close", "vertical", "desc"]:
 					i = 1
 				elif string in ["center", "single_monitor", "toggle"]:
 					i = 2

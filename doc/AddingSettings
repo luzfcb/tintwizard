@@ -1,0 +1,26 @@
+Follow these steps to add new tint2 settings to tintwizard:
+
+1. If the widget is an Entry widget, create a constant with the default
+   value (approx line # 22)
+
+2. Add the appropriate widget to the GUI inside the 'TintWizardGUI'
+   class '__init__' method.
+
+3. Add the widget(s) and the property they relate to inside the
+   propUI dictionary. This is used for looking up which widget
+   to edit when reading from a config.
+
+4. Edit the 'resetConfig' method so the default value can be restored.
+
+5. Update the 'generateConfig' method.
+
+6. If the setting can be disabled in tint2, update the 'readTint2Conf'
+   method, the 'parseConfig' method and the 'parseProp' methods,
+   if appropriate.
+
+7. If widget is a combo box, update the lists in 'parseProp' so the
+   correct index is assigned for each value.
+
+8. Test that default values are restored when creating 'New Config',
+   that the values can be read from a config and written to a config,
+   and that tintwizard behaves properly when no value is used.
