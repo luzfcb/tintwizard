@@ -1,6 +1,6 @@
 [ ABOUT ]
 
-tintwizard 0.23 (30th August 2009)
+tintwizard 0.24 (3rd September 2009)
 
 Thank you for downloading tintwizard!
 
@@ -11,8 +11,7 @@ See http://code.google.com/p/tintwizard/wiki/Help for help
 Please report any problems by posting a bug report at 
 http://code.google.com/p/tintwizard/issues/entry
 
-tintwizard will always work best with the most recent version of tint2,
-which you can download at http://code.google.com/p/tint2/
+This version of tintwizard is optimized for revision 168 of tint2.
 
 [ HOW-TO ]
 
