@@ -890,6 +890,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseMiddle.append_text("shade")
 		self.mouseMiddle.append_text("toggle_iconify")
 		self.mouseMiddle.append_text("maximize_restore")
+		self.mouseMiddle.append_text("desktop_left")
+		self.mouseMiddle.append_text("desktop_right")
 		self.mouseMiddle.set_active(0)
 		self.mouseMiddle.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseMiddle, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -905,6 +907,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseRight.append_text("shade")
 		self.mouseRight.append_text("toggle_iconify")
 		self.mouseRight.append_text("maximize_restore")
+		self.mouseRight.append_text("desktop_left")
+		self.mouseRight.append_text("desktop_right")
 		self.mouseRight.set_active(0)
 		self.mouseRight.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseRight, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -920,6 +924,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseUp.append_text("shade")
 		self.mouseUp.append_text("toggle_iconify")
 		self.mouseUp.append_text("maximize_restore")
+		self.mouseUp.append_text("desktop_left")
+		self.mouseUp.append_text("desktop_right")
 		self.mouseUp.set_active(0)
 		self.mouseUp.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseUp, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -935,6 +941,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseDown.append_text("shade")
 		self.mouseDown.append_text("toggle_iconify")
 		self.mouseDown.append_text("maximize_restore")
+		self.mouseDown.append_text("desktop_left")
+		self.mouseDown.append_text("desktop_right")
 		self.mouseDown.set_active(0)
 		self.mouseDown.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseDown, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -1808,7 +1816,9 @@ class TintWizardGUI(gtk.Window):
 			prop.set_text(string)
 			prop.activate()
 		elif eType == gtk.ComboBox:
-			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor", "none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore", "horizontal", "vertical"]:
+			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
+							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
+							"desktop_left", "desktop_right", "horizontal", "vertical"]:
 				if string in ["bottom", "left", "single_desktop", "none", "horizontal"]:
 					i = 0
 				elif string in ["top", "right", "multi_desktop", "close", "vertical"]:
@@ -1816,7 +1826,8 @@ class TintWizardGUI(gtk.Window):
 				elif string in ["center", "single_monitor", "toggle"]:
 					i = 2
 				else:
-					i = ["none", "close", "toggle", "iconify", "shade", "toggle_iconify", "maximize_restore"].index(string)
+					i = ["none", "close", "toggle", "iconify", "shade", "toggle_iconify", "maximize_restore",
+						"desktop_left", "desktop_right"].index(string)
 				
 				prop.set_active(i)
 			else:

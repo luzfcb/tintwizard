@@ -1,3 +1,6 @@
+3rd September 2009 - Revision 136 - Euan Freeman
+  - Added support for 'desktop_left' and 'desktop_right' mouse actions
+
 3rd September 2009 - Revision 135 - Euan Freeman
   - Fixed problem when creating a 'New Config', where the colour buttons were defaulting to #000000 rather than the default 'fgColor'
   
