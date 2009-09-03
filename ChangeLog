@@ -1,3 +1,8 @@
+3rd September 2009 - Revision 137 - Euan Freeman
+  - User can now "disable" the 'taskbar_active_background_id' option
+  
+  - Renamed changelog.txt to ChangeLog
+
 3rd September 2009 - Revision 136 - Euan Freeman
   - Added support for 'desktop_left' and 'desktop_right' mouse actions
 

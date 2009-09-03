@@ -492,6 +492,10 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarActiveBg.set_active(0)
 		self.taskbarActiveBg.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarActiveBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.taskbarActiveBgEnable = gtk.CheckButton("Enable")
+		self.taskbarActiveBgEnable.set_active(False)
+		self.taskbarActiveBgEnable.connect("toggled", self.changeOccurred)
+		self.tableTaskbar.attach(self.taskbarActiveBgEnable, 2, 3, 4, 5, xoptions=gtk.EXPAND)
 		
 		# Task Options
 		self.tableTask = gtk.Table(rows=12, columns=3, homogeneous=False)
@@ -1424,6 +1428,9 @@ class TintWizardGUI(gtk.Window):
 															self.taskbarPadY.get_text() if self.taskbarPadY.get_text() else TASKBAR_PADDING_X,
 															self.taskbarSpacing.get_text() if self.taskbarSpacing.get_text() else TASK_SPACING))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "taskbar_background_id = %s\n" % (self.taskbarBg.get_active()))
+		# Comment out the taskbar_active_background_id if user has "disabled" it
+		if self.taskbarActiveBgEnable.get_active() == 0:
+			self.configBuf.insert(self.configBuf.get_end_iter(), "#")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "taskbar_active_background_id = %s\n" % (self.taskbarActiveBg.get_active()))
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Tasks\n")
@@ -1605,6 +1612,7 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarSpacing.set_text(TASK_SPACING)
 		self.taskbarBg.set_active(0)
 		self.taskbarActiveBg.set_active(0)
+		self.taskbarActiveBgEnable.set_active(0)
 		# Tasks
 		self.taskBlinks.set_text(TASK_BLINKS)
 		self.taskCentreCheckButton.set_active(True)
@@ -1793,6 +1801,8 @@ class TintWizardGUI(gtk.Window):
 				self.parseProp(self.propUI[e], s[1], True, "time2")
 			elif e == "systray_padding":
 				self.parseProp(self.propUI[e], s[1], True, "tray")
+			elif e == "taskbar_active_background_id":
+				self.parseProp(self.propUI[e], s[1], True, "activeBg")
 			else:
 				if self.propUI.has_key(e):
 					self.parseProp(self.propUI[e], s[1])
@@ -1811,6 +1821,8 @@ class TintWizardGUI(gtk.Window):
 				self.clock2CheckButton.set_active(True)
 			elif propType == "tray":
 				self.trayCheckButton.set_active(True)
+			elif propType == "activeBg":
+				self.taskbarActiveBgEnable.set_active(True)
 		
 		if eType == gtk.Entry:
 			prop.set_text(string)
@@ -1902,6 +1914,7 @@ class TintWizardGUI(gtk.Window):
 		self.clock1CheckButton.set_active(False)
 		self.clock2CheckButton.set_active(False)
 		self.trayCheckButton.set_active(False)
+		self.taskbarActiveBgEnable.set_active(False)
 		
 		# Remove all background styles so we can create new ones as we read them
 		for i in range(len(self.bgs)):
