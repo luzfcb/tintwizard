@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 3rd September 2009
+# Last modified: 5th September 2009
 
 import pygtk
 pygtk.require('2.0')
@@ -264,6 +264,7 @@ class TintWizardGUI(gtk.Window):
 				</menu>
 				<menu action="HelpMenu">
 					<menuitem action="Help" />
+					<menuitem action="Report Bug" />
 					<separator />
 					<menuitem action="About" />
 				</menu>
@@ -299,9 +300,9 @@ class TintWizardGUI(gtk.Window):
 						("HelpMenu", None, "_Help"),
 						("FontChange",gtk.STOCK_SELECT_FONT, "Change All Fonts", None, "Change all fonts at once.", self.changeAllFonts),
 						("Defaults",gtk.STOCK_PREFERENCES, "Change Defaults", None, "Change tintwizard defaults.", self.changeDefaults),
-						("Help",gtk.STOCK_HELP, "_Help", None, "Get help with Tint Wizard", self.help),
-						("About",gtk.STOCK_ABOUT, "_About Tint Wizard", None, "Find out more about Tint Wizard", self.about)])#,
-						#("Refresh",gtk.STOCK_REFRESH, "_Refresh", None, "Refresh the panel preview", self.refreshClicked)])
+						("Help",gtk.STOCK_HELP, "_Help", None, "Get help with tintwizard", self.help),
+						("Report Bug",None, "Report Bug", None, "Report a problem with tintwizard", self.reportBug),
+						("About",gtk.STOCK_ABOUT, "_About Tint Wizard", None, "Find out more about Tint Wizard", self.about)])
 		
 		
 		# Add main UI
@@ -1162,8 +1163,16 @@ class TintWizardGUI(gtk.Window):
 		about.set_authors(AUTHORS)
 		about.set_comments(COMMENTS)
 		about.set_website(WEBSITE)
+		gtk.about_dialog_set_url_hook(self.aboutLinkCallback)
 		about.run()
 		about.destroy()
+	
+	def aboutLinkCallback(dialog, link, data=None):
+		"""Callback for when a URL is clicked in an About dialog."""
+		try:
+			webbrowser.open(link)
+		except:
+			errorDialog(self, "Your default web-browser could not be opened.\nPlease visit %s" % link)
 	
 	def addBg(self):
 		"""Adds a new background to the list of backgrounds."""
@@ -1588,6 +1597,13 @@ class TintWizardGUI(gtk.Window):
 			webbrowser.open("http://code.google.com/p/tintwizard/wiki/Help")
 		except:
 			errorDialog(self, "Your default web-browser could not be opened.\nPlease visit http://code.google.com/p/tintwizard/wiki/Help")
+	
+	def reportBug(self, action=None):
+		"""Opens the bug report page in the default web browser."""
+		try:
+			webbrowser.open("http://code.google.com/p/tintwizard/issues/entry")
+		except:
+			errorDialog(self, "Your default web-browser could not be opened.\nPlease visit http://code.google.com/p/tintwizard/issues/entry")
 	
 	def main(self):
 		"""Enters the main loop."""

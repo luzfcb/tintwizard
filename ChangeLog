@@ -1,4 +1,9 @@
-3rd September 2009 - Euan Freeman
+5th September 2009 - Revision 143 - Euan Freeman
+  - Added 'Report Bug' option to the 'Help' menu
+  
+  - Added clickable URL in the About dialog to take you to the tintwizard website
+
+3rd September 2009 - Revision 140 - Euan Freeman
   - Added 'systray_sort' option
   
   - Created documentation for developers (see doc folder) about how to modify tintwizard to add new tint2 settings.
