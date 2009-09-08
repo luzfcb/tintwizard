@@ -17,7 +17,7 @@ This version of tintwizard is optimized for revision 168 of tint2.
 
 Running tintwizard
   1. Place tintwizard.py and tintwizard.conf in any folder.
-  2. a. Double-click on the file to run
+  2. a. Double-click on the tintwizard.py file to run
      b. In a terminal, navigate to the folder where tintwizard.py is,
         and type:
             ./tintwizard.py
