@@ -1,3 +1,10 @@
+11th September 2009 - Revision 146 - Euan Freeman
+  - Added 'panel_dock' option
+  
+  - Split the Clock tab into 2 new tabs; Clock Display and Clock Settings
+  
+  - Added a formatting guide to the Clock Display tab
+
 8th September 2009 - Revision 145 - Euan Freeman
   - Small edit to README
 
