@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 5th September 2009
+# Last modified: 11th September 2009
 
 import pygtk
 pygtk.require('2.0')
@@ -15,7 +15,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.2.5"
+VERSION = "0.2.6"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
