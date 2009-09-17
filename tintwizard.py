@@ -52,6 +52,10 @@ CLOCK_PADDING_X = "0"
 CLOCK_PADDING_Y = "0"
 CLOCK_LCLICK = ""
 CLOCK_RCLICK = ""
+TOOLTIP_PADDING_X = "0"
+TOOLTIP_PADDING_Y = "0"
+TOOLTIP_SHOW_TIMEOUT = "0"
+TOOLTIP_HIDE_TIMEOUT = "0"
 BATTERY_LOW = "20"
 BATTERY_ACTION = 'notify-send "battery low"'
 BATTERY_PADDING_X = "0"
@@ -909,6 +913,87 @@ class TintWizardGUI(gtk.Window):
 		self.clockRClick.connect("changed", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockRClick, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
+		# Tooltip Options
+		self.tableTooltip = gtk.Table(rows=7, columns=3, homogeneous=False)
+		self.tableTooltip.set_row_spacings(5)
+		self.tableTooltip.set_col_spacings(5)
+		
+		temp = gtk.Label("Show Tooltips")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 0, 1, xpadding=10)
+		self.tooltipShow = gtk.CheckButton()
+		self.tooltipShow.set_active(False)
+		self.tooltipShow.connect("toggled", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipShow, 1, 2, 0, 1, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Padding (x, y)")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 1, 2, xpadding=10)
+		self.tooltipPadX = gtk.Entry(6)
+		self.tooltipPadX.set_width_chars(8)
+		self.tooltipPadX.set_text(TOOLTIP_PADDING_X)
+		self.tooltipPadX.connect("changed", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipPadX, 1, 2, 1, 2, xoptions=gtk.EXPAND)
+		self.tooltipPadY = gtk.Entry(6)
+		self.tooltipPadY.set_width_chars(8)
+		self.tooltipPadY.set_text(TOOLTIP_PADDING_Y)
+		self.tooltipPadY.connect("changed", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipPadY, 2, 3, 1, 2, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Tooltip Show Timeout (seconds)")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 2, 3, xpadding=10)
+		self.tooltipShowTime = gtk.Entry(6)
+		self.tooltipShowTime.set_width_chars(8)
+		self.tooltipShowTime.set_text(TOOLTIP_SHOW_TIMEOUT)
+		self.tooltipShowTime.connect("changed", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipShowTime, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Tooltip Hide Timeout (seconds)")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.tooltipHideTime = gtk.Entry(6)
+		self.tooltipHideTime.set_width_chars(8)
+		self.tooltipHideTime.set_text(TOOLTIP_HIDE_TIMEOUT)
+		self.tooltipHideTime.connect("changed", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipHideTime, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Tooltip Background ID")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.tooltipBg = gtk.combo_box_new_text()
+		self.tooltipBg.append_text("0 (fully transparent)")
+		for i in range(len(self.bgs)):
+			self.tooltipBg.append_text(str(i+1))
+		self.tooltipBg.set_active(0)
+		self.tooltipBg.connect("changed", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Tooltip Font")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.tooltipFont = gtk.FontButton()
+		self.tooltipFont.set_font_name(self.defaults["font"])
+		self.tooltipFont.connect("font-set", self.changeOccurred)
+		self.tableTooltip.attach(self.tooltipFont, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Tooltip Font Color")
+		temp.set_alignment(0, 0.5)
+		self.tableTooltip.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.tooltipFontCol = gtk.Entry(7)
+		self.tooltipFontCol.set_width_chars(9)
+		self.tooltipFontCol.set_name("clockFontCol")
+		self.tooltipFontCol.connect("activate", self.colorTyped)
+		self.tableTooltip.attach(self.tooltipFontCol, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		self.tooltipFontColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
+		self.tooltipFontColButton.set_use_alpha(True)
+		self.tooltipFontColButton.set_name("clockFontCol")
+		self.tooltipFontColButton.connect("color-set", self.colorChange)
+		self.tableTooltip.attach(self.tooltipFontColButton, 2, 3, 6, 7, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tooltipFontCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.clockFontCol.connect("changed", self.changeOccurred)
+		
 		# Mouse Options
 		self.tableMouse = gtk.Table(rows=4, columns=3, homogeneous=False)
 		self.tableMouse.set_row_spacings(5)
@@ -1107,6 +1192,7 @@ class TintWizardGUI(gtk.Window):
 		self.notebook.append_page(self.tableTray, gtk.Label("Systray"))
 		self.notebook.append_page(self.clockNotebook, gtk.Label("Clock"))
 		self.notebook.append_page(self.tableMouse, gtk.Label("Mouse"))
+		self.notebook.append_page(self.tableTooltip, gtk.Label("Tooltips"))
 		self.notebook.append_page(self.tableBattery, gtk.Label("Battery"))
 		self.notebook.append_page(self.configArea, gtk.Label("View Config"))
 		
