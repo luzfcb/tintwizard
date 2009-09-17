@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 11th September 2009
+# Last modified: 17th September 2009
 
 import pygtk
 pygtk.require('2.0')
@@ -15,7 +15,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.2.6"
+VERSION = "0.2.7"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -982,12 +982,12 @@ class TintWizardGUI(gtk.Window):
 		self.tableTooltip.attach(temp, 0, 1, 6, 7, xpadding=10)
 		self.tooltipFontCol = gtk.Entry(7)
 		self.tooltipFontCol.set_width_chars(9)
-		self.tooltipFontCol.set_name("clockFontCol")
+		self.tooltipFontCol.set_name("tooltipFontCol")
 		self.tooltipFontCol.connect("activate", self.colorTyped)
 		self.tableTooltip.attach(self.tooltipFontCol, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		self.tooltipFontColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
 		self.tooltipFontColButton.set_use_alpha(True)
-		self.tooltipFontColButton.set_name("clockFontCol")
+		self.tooltipFontColButton.set_name("tooltipFontCol")
 		self.tooltipFontColButton.connect("color-set", self.colorChange)
 		self.tableTooltip.attach(self.tooltipFontColButton, 2, 3, 6, 7, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.tooltipFontCol.set_text(self.defaults["fgColor"])
@@ -1254,6 +1254,13 @@ class TintWizardGUI(gtk.Window):
 			"mouse_right": self.mouseRight,
 			"mouse_scroll_up": self.mouseUp,
 			"mouse_scroll_down": self.mouseDown,
+			"tooltip": self.tooltipShow,
+			"tooltip_padding": (self.tooltipPadX, self.tooltipPadY),
+			"tooltip_show_timeout": self.tooltipShowTime,
+			"tooltip_hide_timeout": self.tooltipHideTime,
+			"tooltip_background_id": self.tooltipBg,
+			"tooltip_font": self.tooltipFont,
+			"tooltip_font_color": (self.tooltipFontCol, self.tooltipFontColButton),
 			"battery": self.batteryCheckButton,
 			"battery_low_status": self.batteryLow,
 			"battery_low_cmd": self.batteryLowAction,
@@ -1619,6 +1626,17 @@ class TintWizardGUI(gtk.Window):
 			if self.clockRClick.get_text():
 				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_rclick_command = %s\n" % (self.clockRClick.get_text()))
 		
+		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Tooltips\n")
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip = %s\n" % int(self.tooltipShow.get_active()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_padding = %s %s\n" % (self.tooltipPadX.get_text() if self.tooltipPadX.get_text() else TOOLTIP_PADDING_Y,
+															self.tooltipPadY.get_text() if self.tooltipPadY.get_text() else TOOLTIP_PADDING_Y))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_show_timeout = %s\n" % (self.tooltipShowTime.get_text() if self.tooltipShowTime.get_text() else TOOLTIP_SHOW_TIMEOUT))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_hide_timeout = %s\n" % (self.tooltipHideTime.get_text() if self.tooltipHideTime.get_text() else TOOLTIP_HIDE_TIMEOUT))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_background_id = %s\n" % (self.tooltipBg.get_active()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_font = %s\n" % (self.tooltipFont.get_font_name()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_font_color = %s %s\n" % (self.getHexFromWidget(self.tooltipFontColButton),
+															int(self.tooltipFontColButton.get_alpha() / 65535.0 * 100)))
+		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Mouse\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "mouse_middle = %s\n" % (self.mouseMiddle.get_active_text()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "mouse_right = %s\n" % (self.mouseRight.get_active_text()))
@@ -1649,6 +1667,8 @@ class TintWizardGUI(gtk.Window):
 			return self.clockFontColButton
 		elif widget.get_name() == "batteryFontCol":
 			return self.batteryFontColButton
+		elif widget.get_name() == "tooltipFontCol":
+			return self.tooltipFontColButton
 		elif widget.get_name() == "bgColEntry":
 			bgID = self.bgNotebook.get_current_page()
 			
@@ -1677,6 +1697,8 @@ class TintWizardGUI(gtk.Window):
 			return self.clockFontCol
 		elif widget.get_name() == "batteryFontCol":
 			return self.batteryFontCol
+		elif widget.get_name() == "tooltipFontCol":
+			return self.tooltipFontCol
 		elif widget.get_name() == "bgCol":
 			bgID = self.bgNotebook.get_current_page()
 			
@@ -1804,6 +1826,17 @@ class TintWizardGUI(gtk.Window):
 		self.clockBg.set_active(0)
 		self.clockLClick.set_text(CLOCK_LCLICK)
 		self.clockRClick.set_text(CLOCK_RCLICK)
+		# Tooltips
+		self.tooltipShow.set_active(False)
+		self.tooltipPadX.set_text(TOOLTIP_PADDING_X)
+		self.tooltipPadY.set_text(TOOLTIP_PADDING_Y)
+		self.tooltipShowTime.set_text(TOOLTIP_SHOW_TIMEOUT)
+		self.tooltipHideTime.set_text(TOOLTIP_HIDE_TIMEOUT)
+		self.tooltipBg.set_active(0)
+		self.tooltipFont.set_font_name(self.defaults["font"])
+		self.tooltipFontColButton.set_alpha(65535)
+		self.tooltipFontColButton.set_color(gtk.gdk.color_parse(self.defaults["fgColor"]))
+		self.tooltipFontCol.set_text(self.defaults["fgColor"])
 		# Mouse
 		self.mouseMiddle.set_active(0)
 		self.mouseRight.set_active(0)
@@ -2158,7 +2191,7 @@ class TintWizardGUI(gtk.Window):
 	
 	def updateComboBoxes(self, i, action="add"):
 		"""Updates the contents of a combo box when a background style has been added/removed."""
-		cbs = [self.batteryBg, self.clockBg, self.taskbarBg, self.taskbarActiveBg, self.trayBg, self.taskActiveBg, self.taskBg, self.panelBg]
+		cbs = [self.batteryBg, self.clockBg, self.taskbarBg, self.taskbarActiveBg, self.trayBg, self.taskActiveBg, self.taskBg, self.panelBg, self.tooltipBg]
 		
 		if action == "add":
 			for cb in cbs:
