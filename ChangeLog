@@ -1,3 +1,8 @@
+20th September 2009 - Euan Freeman
+  - Updated icon_hsb to icon_asb (hue -> alpha)
+  
+  - Added limits for asb to label widgets
+
 17th September 2009 - Euan Freeman
   - Added support for tint2 tooltip customisation
 

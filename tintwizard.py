@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 17th September 2009
+# Last modified: 20th September 2009
 
 import pygtk
 pygtk.require('2.0')
@@ -15,7 +15,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.2.7"
+VERSION = "0.2.8"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -40,10 +40,10 @@ TASK_SPACING = "0"
 TRAY_PADDING_X = "0"
 TRAY_PADDING_Y = "0"
 TRAY_SPACING = "0"
-ICON_HUE = "0"
+ICON_ALPHA = "0"
 ICON_SAT = "0"
 ICON_BRI = "0"
-ACTIVE_ICON_HUE = "0"
+ACTIVE_ICON_ALPHA = "0"
 ACTIVE_ICON_SAT = "0"
 ACTIVE_ICON_BRI = "0"
 CLOCK_FMT_1 = "%H:%M"
@@ -616,16 +616,16 @@ class TintWizardGUI(gtk.Window):
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 1, 2, xpadding=10)
 		
-		temp = gtk.Label("Icon Hue")
+		temp = gtk.Label("Icon Alpha (0 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.iconHue = gtk.Entry(6)
 		self.iconHue.set_width_chars(8)
-		self.iconHue.set_text(ICON_HUE)
+		self.iconHue.set_text(ICON_ALPHA)
 		self.iconHue.connect("changed", self.changeOccurred)
 		self.tableIcon.attach(self.iconHue, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Icon Saturation")
+		temp = gtk.Label("Icon Saturation (-100 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.iconSat = gtk.Entry(6)
@@ -634,7 +634,7 @@ class TintWizardGUI(gtk.Window):
 		self.iconSat.connect("changed", self.changeOccurred)
 		self.tableIcon.attach(self.iconSat, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Icon Brightness")
+		temp = gtk.Label("Icon Brightness (-100 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.iconBri = gtk.Entry(6)
@@ -643,16 +643,16 @@ class TintWizardGUI(gtk.Window):
 		self.iconBri.connect("changed", self.changeOccurred)
 		self.tableIcon.attach(self.iconBri, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Active Icon Hue")
+		temp = gtk.Label("Active Icon Alpha (0 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.activeIconHue = gtk.Entry(6)
 		self.activeIconHue.set_width_chars(8)
-		self.activeIconHue.set_text(ICON_HUE)
+		self.activeIconHue.set_text(ACTIVE_ICON_ALPHA)
 		self.activeIconHue.connect("changed", self.changeOccurred)
 		self.tableIcon.attach(self.activeIconHue, 1, 2, 5, 6, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Active Icon Saturation")
+		temp = gtk.Label("Active Icon Saturation (-100 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 6, 7, xpadding=10)
 		self.activeIconSat = gtk.Entry(6)
@@ -661,12 +661,12 @@ class TintWizardGUI(gtk.Window):
 		self.activeIconSat.connect("changed", self.changeOccurred)
 		self.tableIcon.attach(self.activeIconSat, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Active Icon Brightness")
+		temp = gtk.Label("Active Icon Brightness (-100 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableIcon.attach(temp, 0, 1, 7, 8, xpadding=10)
 		self.activeIconBri = gtk.Entry(6)
 		self.activeIconBri.set_width_chars(8)
-		self.activeIconBri.set_text(ICON_HUE)
+		self.activeIconBri.set_text(ACTIVE_ICON_BRI)
 		self.activeIconBri.connect("changed", self.changeOccurred)
 		self.tableIcon.attach(self.activeIconBri, 1, 2, 7, 8, xoptions=gtk.EXPAND)
 		
@@ -1235,8 +1235,8 @@ class TintWizardGUI(gtk.Window):
 			"task_font": self.fontButton,
 			"task_font_color": (self.fontCol, self.fontColButton),
 			"task_active_font_color": (self.fontActiveCol, self.fontActiveColButton),
-			"task_icon_hsb": (self.iconHue, self.iconSat, self.iconBri),
-			"task_active_icon_hsb": (self.activeIconHue, self.activeIconSat, self.activeIconBri),
+			"task_icon_asb": (self.iconHue, self.iconSat, self.iconBri),
+			"task_active_icon_asb": (self.activeIconHue, self.activeIconSat, self.activeIconBri),
 			"font_shadow": self.fontShadowCheckButton,
 			"systray_padding": (self.trayPadX, self.trayPadY, self.traySpacing),
 			"systray_background_id": self.trayBg,
@@ -1582,10 +1582,10 @@ class TintWizardGUI(gtk.Window):
 															self.taskPadY.get_text() if self.taskPadY.get_text() else TASK_PADDING_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_background_id = %s\n" % (self.taskBg.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_background_id = %s\n" % (self.taskActiveBg.get_active()))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "task_icon_hsb = %s %s %s\n" % (self.iconHue.get_text() if self.iconHue.get_text() else ICON_HUE,
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_icon_asb = %s %s %s\n" % (self.iconHue.get_text() if self.iconHue.get_text() else ICON_ALPHA,
 															self.iconSat.get_text() if self.iconSat.get_text() else ICON_SAT,
 															self.iconBri.get_text() if self.iconBri.get_text() else ICON_BRI))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_icon_hsb = %s %s %s\n" % (self.activeIconHue.get_text() if self.activeIconHue.get_text() else ACTIVE_ICON_HUE,
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_icon_asb = %s %s %s\n" % (self.activeIconHue.get_text() if self.activeIconHue.get_text() else ACTIVE_ICON_ALPHA,
 															self.activeIconSat.get_text() if self.activeIconSat.get_text() else ACTIVE_ICON_SAT,
 															self.activeIconBri.get_text() if self.activeIconBri.get_text() else ACTIVE_ICON_BRI))
 		
@@ -1788,10 +1788,10 @@ class TintWizardGUI(gtk.Window):
 		self.taskBg.set_active(0)
 		self.taskActiveBg.set_active(0)
 		# Icons
-		self.iconHue.set_text(ICON_HUE)
+		self.iconHue.set_text(ICON_ALPHA)
 		self.iconSat.set_text(ICON_SAT)
 		self.iconBri.set_text(ICON_BRI)
-		self.activeIconHue.set_text(ACTIVE_ICON_HUE)
+		self.activeIconHue.set_text(ACTIVE_ICON_ALPHA)
 		self.activeIconSat.set_text(ACTIVE_ICON_SAT)
 		self.activeIconBri.set_text(ACTIVE_ICON_BRI)
 		# Fonts
