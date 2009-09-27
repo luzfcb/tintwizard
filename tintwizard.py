@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Last modified: 20th September 2009
+# Last modified: 27th September 2009
 
 import pygtk
 pygtk.require('2.0')
@@ -15,7 +15,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.2.8"
+VERSION = "0.2.9"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -769,8 +769,10 @@ class TintWizardGUI(gtk.Window):
 		temp.set_alignment(0, 0.5)
 		self.tableTray.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.trayOrder = gtk.combo_box_new_text()
-		self.trayOrder.append_text("Ascending")
-		self.trayOrder.append_text("Descending")
+		self.trayOrder.append_text("ascending")
+		self.trayOrder.append_text("descending")
+		self.trayOrder.append_text("left2right")
+		self.trayOrder.append_text("right2left")
 		self.trayOrder.set_active(0)
 		self.trayOrder.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.trayOrder, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -1605,7 +1607,7 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_padding = %s %s %s\n" % (self.trayPadX.get_text() if self.trayPadX.get_text() else TRAY_PADDING_X,
 															self.trayPadY.get_text() if self.trayPadY.get_text() else TRAY_PADDING_Y,
 															self.traySpacing.get_text() if self.traySpacing.get_text() else TRAY_SPACING))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_sort = %s\n" % ("asc" if self.trayOrder.get_active() == 0 else "desc"))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_sort = %s\n" % (self.trayOrder.get_active_text()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_background_id = %s\n" % (self.trayBg.get_active()))
 		
 		if self.clockCheckButton.get_active():
@@ -2005,13 +2007,16 @@ class TintWizardGUI(gtk.Window):
 		elif eType == gtk.ComboBox:
 			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
 							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
-							"desktop_left", "desktop_right", "horizontal", "vertical", "asc", "desc"]:
-				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "asc"]:
+							"desktop_left", "desktop_right", "horizontal", "vertical", "ascending", "descending",
+							"left2right", "right2left"]:
+				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "ascending"]:
 					i = 0
-				elif string in ["top", "right", "multi_desktop", "close", "vertical", "desc"]:
+				elif string in ["top", "right", "multi_desktop", "close", "vertical", "descending"]:
 					i = 1
-				elif string in ["center", "single_monitor", "toggle"]:
+				elif string in ["center", "single_monitor", "toggle", "left2right"]:
 					i = 2
+				elif string in ["right2left"]:
+					i = 3
 				else:
 					i = ["none", "close", "toggle", "iconify", "shade", "toggle_iconify", "maximize_restore",
 						"desktop_left", "desktop_right"].index(string)
@@ -2298,6 +2303,3 @@ def trunc(n):
 if __name__ == "__main__":
 	tw = TintWizardGUI()
 	tw.main()
-	
-	#import pdb
-	#pdb.run("tw.main()")
