@@ -48,6 +48,7 @@ PANEL_PADDING_Y = "0"
 PANEL_MONITOR = "all"
 TASKBAR_PADDING_X = "0"
 TASKBAR_PADDING_Y = "0"
+TASKBAR_SPACING = "0"
 TASK_BLINKS = "7"
 TASK_MAXIMUM_SIZE_X = "200"
 TASK_MAXIMUM_SIZE_Y = "32"
@@ -480,7 +481,7 @@ class TintWizardGUI(gtk.Window):
 		self.tablePanel.attach(self.panelMonitor, 1, 2, 8, 9, xoptions=gtk.EXPAND)
 
 		# Taskbar
-		self.tableTaskbar = gtk.Table(rows=4, columns=3, homogeneous=False)
+		self.tableTaskbar = gtk.Table(rows=5, columns=3, homogeneous=False)
 		self.tableTaskbar.set_row_spacings(5)
 		self.tableTaskbar.set_col_spacings(5)
 
@@ -508,31 +509,40 @@ class TintWizardGUI(gtk.Window):
 		self.taskbarPadY.connect("changed", self.changeOccurred)
 		self.tableTaskbar.attach(self.taskbarPadY, 2, 3, 1, 2, xoptions=gtk.EXPAND)
 
-		temp = gtk.Label("Taskbar Background ID")
+		temp = gtk.Label("Horizontal Spacing")
 		temp.set_alignment(0, 0.5)
 		self.tableTaskbar.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.panelSpacing = gtk.Entry(6)
+		self.panelSpacing.set_width_chars(8)
+		self.panelSpacing.set_text(TASKBAR_SPACING)
+		self.panelSpacing.connect("changed", self.changeOccurred)
+		self.tableTaskbar.attach(self.panelSpacing, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+
+		temp = gtk.Label("Taskbar Background ID")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskbar.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.taskbarBg = gtk.combo_box_new_text()
 		self.taskbarBg.append_text("0 (fully transparent)")
 		for i in range(len(self.bgs)):
 			self.taskbarBg.append_text(str(i+1))
 		self.taskbarBg.set_active(0)
 		self.taskbarBg.connect("changed", self.changeOccurred)
-		self.tableTaskbar.attach(self.taskbarBg, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tableTaskbar.attach(self.taskbarBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Active Taskbar Background ID")
 		temp.set_alignment(0, 0.5)
-		self.tableTaskbar.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.tableTaskbar.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.taskbarActiveBg = gtk.combo_box_new_text()
 		self.taskbarActiveBg.append_text("0 (fully transparent)")
 		for i in range(len(self.bgs)):
 			self.taskbarActiveBg.append_text(str(i+1))
 		self.taskbarActiveBg.set_active(0)
 		self.taskbarActiveBg.connect("changed", self.changeOccurred)
-		self.tableTaskbar.attach(self.taskbarActiveBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tableTaskbar.attach(self.taskbarActiveBg, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.taskbarActiveBgEnable = gtk.CheckButton("Enable")
 		self.taskbarActiveBgEnable.set_active(False)
 		self.taskbarActiveBgEnable.connect("toggled", self.changeOccurred)
-		self.tableTaskbar.attach(self.taskbarActiveBgEnable, 2, 3, 4, 5, xoptions=gtk.EXPAND)
+		self.tableTaskbar.attach(self.taskbarActiveBgEnable, 2, 3, 5, 6, xoptions=gtk.EXPAND)
 
 		# Task Options
 		self.tableTask = gtk.Table(rows=12, columns=3, homogeneous=False)
@@ -1243,7 +1253,7 @@ class TintWizardGUI(gtk.Window):
 			"panel_position": (self.panelPosY, self.panelPosX, self.panelOrientation),
 			"panel_size": (self.panelSizeX, self.panelSizeY),
 			"panel_margin": (self.panelMarginX, self.panelMarginY),
-			"panel_padding": (self.panelPadX, self.panelPadY),
+			"panel_padding": (self.panelPadX, self.panelPadY, self.panelSpacing),
 			"wm_menu": self.panelMenu,
 			"panel_dock": self.panelDock,
 			"panel_background_id": self.panelBg,
@@ -1586,8 +1596,9 @@ class TintWizardGUI(gtk.Window):
 															self.panelSizeY.get_text() if self.panelSizeY.get_text() else PANEL_SIZE_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_margin = %s %s\n" % (self.panelMarginX.get_text() if self.panelMarginX.get_text() else PANEL_MARGIN_X,
 															self.panelMarginY.get_text() if self.panelMarginY.get_text() else PANEL_MARGIN_Y))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_padding = %s %s\n" % (self.panelPadX.get_text() if self.panelPadX.get_text() else PANEL_PADDING_X,
-															self.panelPadY.get_text() if self.panelPadY.get_text() else PANEL_PADDING_Y))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_padding = %s %s %s\n" % (self.panelPadX.get_text() if self.panelPadX.get_text() else PANEL_PADDING_X,
+															self.panelPadY.get_text() if self.panelPadY.get_text() else PANEL_PADDING_Y,
+															self.panelSpacing.get_text() if self.panelSpacing.get_text() else TASKBAR_SPACING))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_dock = %s\n" % int(self.panelDock.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "wm_menu = %s\n" % int(self.panelMenu.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_background_id = %s\n" % (self.panelBg.get_active()))
@@ -1792,6 +1803,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelMarginY.set_text(PANEL_MARGIN_Y)
 		self.panelPadX.set_text(PANEL_PADDING_Y)
 		self.panelPadY.set_text(PANEL_PADDING_Y)
+		self.panelSpacing.set_text(TASKBAR_SPACING)
 		self.panelBg.set_active(0)
 		self.panelMenu.set_active(0)
 		self.panelDock.set_active(0)
