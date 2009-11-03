@@ -1939,9 +1939,17 @@ class TintWizardGUI(gtk.Window):
 					child.set_text(d["border_color"].split(" ")[0].strip())
 					child.activate()
 				elif child.get_name() == "bgCol":
-					child.set_alpha(int(int(d["background_color"].split(" ")[1].strip()) * 65535 / 100.0))
+					list = d["background_color"].split(" ")
+					if len(list) > 1:
+						child.set_alpha(int(int(list[1].strip()) * 65535 / 100.0))
+					else:
+						child.set_alpha(65535)
 				elif child.get_name() == "borderCol":
-					child.set_alpha(int(int(d["border_color"].split(" ")[1].strip()) * 65535 / 100.0))
+					list = d["border_color"].split(" ")
+					if len(list) > 1:
+						child.set_alpha(int(int(list[1].strip()) * 65535 / 100.0))
+					else:
+						child.set_alpha(65535)
 
 			newId = len(self.bgs)
 
@@ -2044,7 +2052,10 @@ class TintWizardGUI(gtk.Window):
 		elif eType == tuple:									# If a property has more than 1 value, for example the x and y co-ords
 			s = string.split(" ")								# of the padding properties, then just we use recursion to set the
 			for i in range(len(prop)):							# value of each associated widget.
-				self.parseProp(prop[i], s[i])
+				if i >= len(s):
+					self.parseProp(prop[i], "0")
+				else:
+					self.parseProp(prop[i], s[i])
 
 	def quit(self, widget, event=None):
 		"""Asks if user would like to save file before quitting, then quits the program."""
