@@ -1,3 +1,7 @@
+3rd november 2009 - thierry lorthiois
+  - call tintwizard with config file parameter. 
+    in this case, tintwizard can only change this file.
+
 27th September 2009 - Euan Freeman
   - Updated for tint2 revision 208 (systray_sort options)
 
