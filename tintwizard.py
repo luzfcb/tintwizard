@@ -761,10 +761,10 @@ class TintWizardGUI(gtk.Window):
 		temp = gtk.Label("Show Systray")
 		temp.set_alignment(0, 0.5)
 		self.tableTray.attach(temp, 0, 1, 0, 1, xpadding=10)
-		self.trayCheckButton = gtk.CheckButton()
-		self.trayCheckButton.set_active(True)
-		self.trayCheckButton.connect("toggled", self.changeOccurred)
-		self.tableTray.attach(self.trayCheckButton, 1, 2, 0, 1, xoptions=gtk.EXPAND)
+		self.trayShow = gtk.CheckButton()
+		self.trayShow.set_active(True)
+		self.trayShow.connect("toggled", self.changeOccurred)
+		self.tableTray.attach(self.trayShow, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Padding (x, y)")
 		temp.set_alignment(0, 0.5)
@@ -1264,6 +1264,7 @@ class TintWizardGUI(gtk.Window):
 			"task_icon_asb": (self.iconHue, self.iconSat, self.iconBri),
 			"task_active_icon_asb": (self.activeIconHue, self.activeIconSat, self.activeIconBri),
 			"font_shadow": self.fontShadowCheckButton,
+			"systray": self.trayShow,
 			"systray_padding": (self.trayPadX, self.trayPadY, self.traySpacing),
 			"systray_background_id": self.trayBg,
 			"systray_sort": self.trayOrder,
@@ -1627,11 +1628,8 @@ class TintWizardGUI(gtk.Window):
 															int(self.fontActiveColButton.get_alpha() / 65535.0 * 100)))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "font_shadow = %s\n" % int(self.fontShadowCheckButton.get_active()))
 
-		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Systray")
-		if not self.trayCheckButton.get_active():
-			self.configBuf.insert(self.configBuf.get_end_iter(), " - DISABLED\n#")
-		else:
-			self.configBuf.insert(self.configBuf.get_end_iter(), "\n")
+		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Systray\n")
+		self.configBuf.insert(self.configBuf.get_end_iter(), "systray = %s\n" % int(self.trayShow.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_padding = %s %s %s\n" % (self.trayPadX.get_text() if self.trayPadX.get_text() else TRAY_PADDING_X,
 															self.trayPadY.get_text() if self.trayPadY.get_text() else TRAY_PADDING_Y,
 															self.traySpacing.get_text() if self.traySpacing.get_text() else TRAY_SPACING))
@@ -1834,7 +1832,7 @@ class TintWizardGUI(gtk.Window):
 		self.fontActiveCol.set_text(self.defaults["fgColor"])
 		self.fontShadowCheckButton.set_active(False)
 		# Systray
-		self.trayCheckButton.set_active(True)
+		self.trayShow.set_active(True)
 		self.trayPadX.set_text(TRAY_PADDING_X)
 		self.trayPadY.set_text(TRAY_PADDING_X)
 		self.traySpacing.set_text(TRAY_SPACING)
@@ -2033,7 +2031,7 @@ class TintWizardGUI(gtk.Window):
 				self.clockCheckButton.set_active(True)
 				self.clock2CheckButton.set_active(True)
 			elif propType == "tray":
-				self.trayCheckButton.set_active(True)
+				self.trayShow.set_active(True)
 			elif propType == "activeBg":
 				self.taskbarActiveBgEnable.set_active(True)
 
@@ -2139,7 +2137,7 @@ class TintWizardGUI(gtk.Window):
 		self.clockCheckButton.set_active(False)
 		self.clock1CheckButton.set_active(False)
 		self.clock2CheckButton.set_active(False)
-		self.trayCheckButton.set_active(False)
+		self.trayShow.set_active(False)
 		self.taskbarActiveBgEnable.set_active(False)
 
 		# Remove all background styles so we can create new ones as we read them
