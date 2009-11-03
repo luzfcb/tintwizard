@@ -1,13 +1,12 @@
 3rd november 2009 - thierry lorthiois
-  - call tintwizard with config file parameter. 
-    in this case, tintwizard can only change this file.
+  - call tintwizard with config file parameter.
 
 27th September 2009 - Euan Freeman
   - Updated for tint2 revision 208 (systray_sort options)
 
 20th September 2009 - Euan Freeman
   - Updated icon_hsb to icon_asb (hue -> alpha)
-  
+
   - Added limits for asb to label widgets
 
 17th September 2009 - Euan Freeman
@@ -15,9 +14,9 @@
 
 11th September 2009 - Revision 146 - Euan Freeman
   - Added 'panel_dock' option
-  
+
   - Split the Clock tab into 2 new tabs; Clock Display and Clock Settings
-  
+
   - Added a formatting guide to the Clock Display tab
 
 8th September 2009 - Revision 145 - Euan Freeman
@@ -25,17 +24,17 @@
 
 5th September 2009 - Revision 143 - Euan Freeman
   - Added 'Report Bug' option to the 'Help' menu
-  
+
   - Added clickable URL in the About dialog to take you to the tintwizard website
 
 3rd September 2009 - Revision 140 - Euan Freeman
   - Added 'systray_sort' option
-  
+
   - Created documentation for developers (see doc folder) about how to modify tintwizard to add new tint2 settings.
 
 3rd September 2009 - Revision 137 - Euan Freeman
   - User can now "disable" the 'taskbar_active_background_id' option
-  
+
   - Renamed changelog.txt to ChangeLog
 
 3rd September 2009 - Revision 136 - Euan Freeman
@@ -43,40 +42,40 @@
 
 3rd September 2009 - Revision 135 - Euan Freeman
   - Fixed problem when creating a 'New Config', where the colour buttons were defaulting to #000000 rather than the default 'fgColor'
-  
+
   - Grouped all the related 'Task' tabs under a new notebook
-  
+
   - Added support for 'task_icon_hsb', 'task_active_icon_hsb' and 'taskbar_active_background_id'
-  
+
   - Added support for 'maximize_restore' mouse action (see tint2 r156)
 
 30th August 2009 - Revision 130 - Euan Freeman
   - Removed "single_monitor" option from "taskbar_mode"
-  
+
   - Updated options available for "panel_pos" to include "horizontal" / "vertical"
-  
+
   - Changed default clock2 format from "%A %d %B" to "%a %d %b"
-  
+
   - Replaced "task_width" with "task_maximum_size"
-  
+
   - The panel size label gets updated to either "Size (width, height)" or "Size (height, width)" depending on the orientation chosen.
-  
+
   - Added link to http://code.google.com/p/tint2/ in README
-  
+
   - Added the options "clock_lclick_command" and "clock_rclick_command"
 
 28th August 2009 - Revision 127 - Euan Freeman
   - Added the wm_menu option
-  
+
   - Refactored the 'new config' function
-  
+
   - Added some documentation to code
-  
+
   - When applying config to tint2, user has choice to use this as the default
 
 27th August 2009 - Revision 124 - Euan Freeman
   - Fixed problem reading/writing to tintwizard.conf
-  
+
   - Made changes to README file
 
 26th June 2009 - Revision 115 - Euan Freeman
@@ -84,34 +83,34 @@
 
 24th June 2009 - Revision 114 - Euan Freeman
   - Extracted code which searches for label matching a color button, placed in new method (getColorLabel)
-  
+
   - Renamed colorButtonLookup to getColorButton
-  
+
   - Minor documentation changes
-  
+
   - Changed the way background styles are parsed from tint2 config files. The original method was quite large so split this into two functions.
-  
+
   - Renamed readFile to readTint2Config to clear up any confusion
-  
+
 23rd June 2009 - Revision 113 - Euan Freeman
   - Added statusbar widget. At the moment it displays filename of config being edited, and displays an asterisk symbol if the user changes the config since the last open/save
 
   - Connected "changed" / "toggled" / "font-set" events to every widget the user can edit. These all call the changeOccurred() method, which updates the statusbar and sets the variable toSave to True.
 
   - Fixed a bug where when the user types an invalid hex value, it still tried to update the color button. In solving this, I changed the way in which the program fetches the color button corresponding to the text entry field.
-  
+
   - Fixed a bug where, if launching from the same directory as the app is located in, it searches for "/tintwizard.conf" rather than "./tintwizard.conf". This bug still needs verification, but I think it has been fixed.
-  
+
   - Removed code which sets the minimum size of the window. It's better to let GTK handle this itself.
-  
+
   - Updated row count in constructor for the layout "table" in __init__ method of the TintWizardGUI class. This doesn't really matter, since the table object updates itself anyway.
-  
+
 23rd June 2009 - Revision 112 - Euan Freeman
   - Removed the no longer needed refresh() method from the TintWizardGUI class.
-  
+
   - Added separator to the Tint2 menu, just above the "Apply" menu item.
-  
+
   - Added / modified some documentation
-  
+
 23rd June 2009 - Revision 111 - Euan Freeman
   - Initial import to svn repository.
