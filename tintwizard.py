@@ -1495,13 +1495,14 @@ class TintWizardGUI(gtk.Window):
 			widget.set_text(buttonHex)
 			return
 
-		try:
-			col = gtk.gdk.Color(s)
-		except:
-			errorDialog(self, "Invalid color specification!")
-			#self.colorChange(widget) TODO - remove this when issue 29 is verified
-			widget.set_text(buttonHex)
-			return
+		if not self.oneConfigFile:
+			try:
+				col = gtk.gdk.Color(s)
+			except:
+				errorDialog(self, "Invalid color specification!")
+				#self.colorChange(widget) TODO - remove this when issue 29 is verified
+				widget.set_text(buttonHex)
+				return
 
 		colorButton.set_color(col)
 
