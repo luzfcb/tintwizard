@@ -1237,11 +1237,24 @@ class TintWizardGUI(gtk.Window):
 		# Add notebook to window and show
 		self.table.attach(self.notebook, 0, 4, 2, 3, xpadding=5, ypadding=5)
 
+		if self.oneConfigFile:
+			# Add button Apply and Close
+			self.box1 = gtk.HBox(False, 20)
+			self.table.attach(self.box1, 0, 4, 3, 4, xpadding=5, ypadding=5)
+			temp = gtk.Button("Apply", gtk.STOCK_APPLY)
+			temp.set_name("applyBg")
+			temp.connect("clicked", self.apply)
+			self.box1.pack_start(temp, True, True, 0)
+			temp = gtk.Button("Close", gtk.STOCK_CLOSE)
+			temp.set_name("closeBg")
+			temp.connect("clicked", self.quit)
+			self.box1.pack_start(temp, True, True, 0)
+
 		# Create and add the status bar to the bottom of the main window
 		self.statusBar = gtk.Statusbar()
 		self.statusBar.set_has_resize_grip(True)
 		self.updateStatusBar("New Config File [*]")
-		self.table.attach(self.statusBar, 0, 4, 3, 4)
+		self.table.attach(self.statusBar, 0, 4, 4, 5)
 
 		self.add(self.table)
 
