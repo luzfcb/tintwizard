@@ -1428,39 +1428,52 @@ class TintWizardGUI(gtk.Window):
 
 	def apply(self, widget, event=None, confirmChange=True):
 		"""Applies the current config to tint2."""
-		if confirmDialog(self, "This will terminate all currently running instances of tint2 before applying config. Continue?") == gtk.RESPONSE_YES:
-			if not self.save():
-				return
+		# Check if tint2 is running
+		procs = os.popen('pidof "tint2"')				# Check list of active processes for tint2
+		pids = []										# List of process ids for tint2
 
-			#shutil.copyfile(self.filename, self.filename+".backup")		# Create backup
+		for proc in procs.readlines():
+			pids += [int(proc.strip().split(" ")[0])]
 
-			# Check if tint2 is running
-			procs = os.popen('pidof "tint2"')				# Check list of active processes for tint2
-			pids = []										# List of process ids for tint2
+		procs.close()
 
-			for proc in procs.readlines():
-				pids += [int(proc.strip().split(" ")[0])]
-
-			procs.close()
-
-			# If it is - kill it
+		if self.oneConfigFile:
+			# Save and copy as default
+			self.save()
+			tmpSrc = self.filename
+			tmpDest = os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc"
+			try:
+				shutil.copyfile(tmpSrc, tmpDest)
+			except shutil.Error:
+				pass
+			# Ask tint2 to reload config
 			for pid in pids:
-				os.kill(pid, signal.SIGTERM)
+				os.kill(pid, signal.SIGUSR1)
+		else:
+			if confirmDialog(self, "This will terminate all currently running instances of tint2 before applying config. Continue?") == gtk.RESPONSE_YES:
+				if not self.save():
+					return
 
-			# Lastly, start it
-			os.spawnv(os.P_NOWAIT, self.tint2Bin, [self.tint2Bin, "-c" + self.filename])
+				#shutil.copyfile(self.filename, self.filename+".backup")		# Create backup
 
-			if confirmChange and self.filename != (os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc") and confirmDialog(self, "Use this as default tint2 config?") == gtk.RESPONSE_YES:
-				tmp = self.filename
-				self.filename = os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc"
-				try:
-					shutil.copyfile(tmp, self.filename)
-				except shutil.Error:
-					pass
+				# If it is - kill it
+				for pid in pids:
+					os.kill(pid, signal.SIGTERM)
 
-			#if confirmChange and confirmDialog(self, "Keep this config?") == gtk.RESPONSE_NO:
-			#	shutil.copyfile(self.filename+".backup", self.filename)		# Create backup
-			#	self.apply(widget, event, False)
+				# Lastly, start it
+				os.spawnv(os.P_NOWAIT, self.tint2Bin, [self.tint2Bin, "-c" + self.filename])
+
+				if confirmChange and self.filename != (os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc") and confirmDialog(self, "Use this as default tint2 config?") == gtk.RESPONSE_YES:
+					tmp = self.filename
+					self.filename = os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc"
+					try:
+						shutil.copyfile(tmp, self.filename)
+					except shutil.Error:
+						pass
+
+				#if confirmChange and confirmDialog(self, "Keep this config?") == gtk.RESPONSE_NO:
+				#	shutil.copyfile(self.filename+".backup", self.filename)		# Create backup
+				#	self.apply(widget, event, False)
 
 	def changeAllFonts(self, widget):
 		"""Changes all fonts at once."""
