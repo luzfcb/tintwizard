@@ -334,7 +334,7 @@ class TintWizardGUI(gtk.Window):
 
 
 		# Add main UI
-		self.uiManager.insert_action_group(self.ag)
+		self.uiManager.insert_action_group(self.ag, -1)
 		self.uiManager.add_ui_from_string(ui)
 
 		if not self.oneConfigFile:
