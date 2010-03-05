@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #*************************************************************************/
-# Last modified: 27th September 2009
+# Last modified: 5th March 2010
 
 import pygtk
 pygtk.require('2.0')
@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.2.9"
+VERSION = "SVN r169"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -46,6 +46,9 @@ PANEL_MARGIN_Y = "0"
 PANEL_PADDING_X = "0"
 PANEL_PADDING_Y = "0"
 PANEL_MONITOR = "all"
+PANEL_AUTOHIDE_SHOW = "0.0"
+PANEL_AUTOHIDE_HIDE = "0.0"
+PANEL_AUTOHIDE_HEIGHT = "0"
 TASKBAR_PADDING_X = "0"
 TASKBAR_PADDING_Y = "0"
 TASKBAR_SPACING = "0"
@@ -332,6 +335,14 @@ class TintWizardGUI(gtk.Window):
 						("Report Bug",None, "Report Bug", None, "Report a problem with tintwizard", self.reportBug),
 						("About",gtk.STOCK_ABOUT, "_About Tint Wizard", None, "Find out more about Tint Wizard", self.about)])
 
+		# Experimental stuff
+		# TODO - is this really needed?
+		
+		#actions = self.ag.list_actions()
+		
+		#for action in actions:
+		#	action.connect("focus-in-event", self.mouseoverCallback)
+
 
 		# Add main UI
 		self.uiManager.insert_action_group(self.ag, -1)
@@ -370,116 +381,156 @@ class TintWizardGUI(gtk.Window):
 		self.tableBgs.attach(temp, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		# Panel Options
-		self.tablePanel = gtk.Table(rows=9, columns=3, homogeneous=False)
-		self.tablePanel.set_row_spacings(5)
-		self.tablePanel.set_col_spacings(5)
+		self.tablePanelDisplay = gtk.Table(rows=6, columns=3, homogeneous=False)
+		self.tablePanelDisplay.set_row_spacings(5)
+		self.tablePanelDisplay.set_col_spacings(5)
 
 		temp = gtk.Label("Position")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 0, 1, xpadding=10)
+		self.tablePanelDisplay.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.panelPosY = gtk.combo_box_new_text()
 		self.panelPosY.append_text("bottom")
 		self.panelPosY.append_text("top")
 		self.panelPosY.append_text("center")
 		self.panelPosY.set_active(0)
 		self.panelPosY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelPosY, 2, 3, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelPosY, 2, 3, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		self.panelPosX = gtk.combo_box_new_text()
 		self.panelPosX.append_text("left")
 		self.panelPosX.append_text("right")
 		self.panelPosX.append_text("center")
 		self.panelPosX.set_active(0)
 		self.panelPosX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelPosX, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelPosX, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Panel Orientation")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 1, 2, xpadding=10)
+		self.tablePanelDisplay.attach(temp, 0, 1, 1, 2, xpadding=10)
 		self.panelOrientation = gtk.combo_box_new_text()
 		self.panelOrientation.append_text("horizontal")
 		self.panelOrientation.append_text("vertical")
 		self.panelOrientation.set_active(0)
 		self.panelOrientation.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelOrientation, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelOrientation, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		self.panelSizeLabel = gtk.Label("Size (width, height)")
 		self.panelSizeLabel.set_alignment(0, 0.5)
-		self.tablePanel.attach(self.panelSizeLabel, 0, 1, 2, 3, xpadding=10)
+		self.tablePanelDisplay.attach(self.panelSizeLabel, 0, 1, 2, 3, xpadding=10)
 		self.panelSizeX = gtk.Entry(6)
 		self.panelSizeX.set_width_chars(8)
 		self.panelSizeX.set_text(PANEL_SIZE_X)
 		self.panelSizeX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelSizeX, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelSizeX, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 		self.panelSizeY = gtk.Entry(6)
 		self.panelSizeY.set_width_chars(8)
 		self.panelSizeY.set_text(PANEL_SIZE_Y)
 		self.panelSizeY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelSizeY, 2, 3, 2, 3, xoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelSizeY, 2, 3, 2, 3, xoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Margin (x, y)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.tablePanelDisplay.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.panelMarginX = gtk.Entry(6)
 		self.panelMarginX.set_width_chars(8)
 		self.panelMarginX.set_text(PANEL_MARGIN_X)
 		self.panelMarginX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMarginX, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelMarginX, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		self.panelMarginY = gtk.Entry(6)
 		self.panelMarginY.set_width_chars(8)
 		self.panelMarginY.set_text(PANEL_MARGIN_Y)
 		self.panelMarginY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMarginY, 2, 3, 3, 4, xoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelMarginY, 2, 3, 3, 4, xoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Padding (x, y)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.tablePanelDisplay.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.panelPadX = gtk.Entry(6)
 		self.panelPadX.set_width_chars(8)
 		self.panelPadX.set_text(PANEL_PADDING_Y)
 		self.panelPadX.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelPadX, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelPadX, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		self.panelPadY = gtk.Entry(6)
 		self.panelPadY.set_width_chars(8)
 		self.panelPadY.set_text(PANEL_PADDING_Y)
 		self.panelPadY.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelPadY, 2, 3, 4, 5, xoptions=gtk.EXPAND)
+		self.tablePanelDisplay.attach(self.panelPadY, 2, 3, 4, 5, xoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Panel Background ID")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.tablePanelDisplay.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.panelBg = gtk.combo_box_new_text()
 		self.panelBg.append_text("0 (fully transparent)")
 		for i in range(len(self.bgs)):
 			self.panelBg.append_text(str(i+1))
 		self.panelBg.set_active(0)
 		self.panelBg.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelBg, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
+		self.tablePanelDisplay.attach(self.panelBg, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		# Panel Settings
+		self.tablePanelSettings = gtk.Table(rows=7, columns=3, homogeneous=False)
+		self.tablePanelSettings.set_row_spacings(5)
+		self.tablePanelSettings.set_col_spacings(5)
+		
 		temp = gtk.Label("Window Manager Menu")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.panelMenu = gtk.CheckButton()
 		self.panelMenu.set_active(False)
 		self.panelMenu.connect("toggled", self.changeOccurred)
-		self.tablePanel.attach(self.panelMenu, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelMenu, 1, 2, 0, 1, xoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Place In Window Manager Dock")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 7, 8, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 1, 2, xpadding=10)
 		self.panelDock = gtk.CheckButton()
 		self.panelDock.set_active(False)
 		self.panelDock.connect("toggled", self.changeOccurred)
-		self.tablePanel.attach(self.panelDock, 1, 2, 7, 8, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelDock, 1, 2, 1, 2, xoptions=gtk.EXPAND)
 
 		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanel.attach(temp, 0, 1, 8, 9, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.panelMonitor = gtk.Entry(6)
 		self.panelMonitor.set_width_chars(8)
 		self.panelMonitor.set_text(PANEL_MONITOR)
 		self.panelMonitor.connect("changed", self.changeOccurred)
-		self.tablePanel.attach(self.panelMonitor, 1, 2, 8, 9, xoptions=gtk.EXPAND)
-
+		self.tablePanelSettings.attach(self.panelMonitor, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Panel")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.panelAutohide = gtk.CheckButton()
+		self.panelAutohide.set_active(False)
+		self.panelAutohide.connect("toggled", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelAutohide, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Show Timeout (seconds)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.panelAutohideShow = gtk.Entry(6)
+		self.panelAutohideShow.set_width_chars(8)
+		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
+		self.panelAutohideShow.connect("changed", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelAutohideShow, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Hide Timeout (seconds)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.panelAutohideHide = gtk.Entry(6)
+		self.panelAutohideHide.set_width_chars(8)
+		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
+		self.panelAutohideHide.connect("changed", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelAutohideHide, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Hidden Height")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.panelAutohideHeight = gtk.Entry(6)
+		self.panelAutohideHeight.set_width_chars(8)
+		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
+		self.panelAutohideHeight.connect("changed", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelAutohideHeight, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=5, columns=3, homogeneous=False)
 		self.tableTaskbar.set_row_spacings(5)
@@ -1205,6 +1256,13 @@ class TintWizardGUI(gtk.Window):
 		self.bgNotebook.set_current_page(0)
 
 		# Create sub-notebooks
+		self.panelNotebook = gtk.Notebook()
+		self.panelNotebook.set_tab_pos(gtk.POS_TOP)
+		self.panelNotebook.set_current_page(0)
+		
+		self.panelNotebook.append_page(self.tablePanelDisplay, gtk.Label("Panel Display"))
+		self.panelNotebook.append_page(self.tablePanelSettings, gtk.Label("Panel Settings"))
+		
 		self.taskNotebook = gtk.Notebook()
 		self.taskNotebook.set_tab_pos(gtk.POS_TOP)
 		self.taskNotebook.set_current_page(0)
@@ -1222,7 +1280,7 @@ class TintWizardGUI(gtk.Window):
 
 		# Add pages to notebook
 		self.notebook.append_page(self.tableBgs, gtk.Label("Backgrounds"))
-		self.notebook.append_page(self.tablePanel, gtk.Label("Panel"))
+		self.notebook.append_page(self.panelNotebook, gtk.Label("Panel"))
 		self.notebook.append_page(self.tableTaskbar, gtk.Label("Taskbar"))
 		self.notebook.append_page(self.taskNotebook, gtk.Label("Tasks"))
 		self.notebook.append_page(self.tableTray, gtk.Label("Systray"))
@@ -1270,6 +1328,10 @@ class TintWizardGUI(gtk.Window):
 			"wm_menu": self.panelMenu,
 			"panel_dock": self.panelDock,
 			"panel_background_id": self.panelBg,
+			"autohide": self.panelAutohide,
+			"autohide_show_timeout": self.panelAutohideShow,
+			"autohide_hide_timeout": self.panelAutohideHide,
+			"autohide_height": self.panelAutohideHeight,
 			"taskbar_mode": self.taskbarMode,
 			"taskbar_padding": (self.taskbarPadX, self.taskbarPadY, self.taskbarSpacing),
 			"taskbar_background_id": self.taskbarBg,
@@ -1325,6 +1387,10 @@ class TintWizardGUI(gtk.Window):
 			self.readTint2Config()
 
 		self.generateConfig()
+
+	# TODO - is this really needed?
+	def mouseoverCallback(self, widget=None):
+		print widget
 
 	def about(self, action=None):
 		"""Displays the About dialog."""
@@ -1544,16 +1610,14 @@ class TintWizardGUI(gtk.Window):
 		buttonHex = self.getHexFromWidget(colorButton)
 
 		if len(s) != 7:
-			errorDialog(self, "Invalid color specification!")
-			#self.colorChange(widget) TODO - remove this when issue 29 is verified
+			errorDialog(self, "Invalid color specification: [%s]" % s)
 			widget.set_text(buttonHex)
 			return
 
 		try:
 			col = gtk.gdk.Color(s)
 		except:
-			errorDialog(self, "Invalid color specification!")
-			#self.colorChange(widget) TODO - remove this when issue 29 is verified
+			errorDialog(self, "Invalid color specification: [%s]" % s)
 			widget.set_text(buttonHex)
 			return
 
@@ -1628,7 +1692,13 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_dock = %s\n" % int(self.panelDock.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "wm_menu = %s\n" % int(self.panelMenu.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_background_id = %s\n" % (self.panelBg.get_active()))
-
+		
+		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Panel Autohide\n")
+		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide = %s\n" % int(self.panelAutohide.get_active()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_show_timeout = %s\n" % (self.panelAutohideShow.get_text() if self.panelAutohideShow.get_text() else PANEL_AUTOHIDE_SHOW))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_hide_timeout = %s\n" % (self.panelAutohideHide.get_text() if self.panelAutohideHide.get_text() else PANEL_AUTOHIDE_HIDE))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_height = %s\n" % (self.panelAutohideHeight.get_text() if self.panelAutohideHeight.get_text() else PANEL_AUTOHIDE_HEIGHT))
+		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Taskbar\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "taskbar_mode = %s\n" % (self.taskbarMode.get_active_text()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "taskbar_padding = %s %s %s\n" % (self.taskbarPadX.get_text() if self.taskbarPadX.get_text() else TASKBAR_PADDING_X,
@@ -1834,6 +1904,10 @@ class TintWizardGUI(gtk.Window):
 		self.panelMenu.set_active(0)
 		self.panelDock.set_active(0)
 		self.panelMonitor.set_text(PANEL_MONITOR)
+		self.panelAutohide.set_active(0)
+		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
+		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
+		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
 		# Taskbar
 		self.taskbarMode.set_active(0)
 		self.taskbarPadX.set_text(TASKBAR_PADDING_X)
