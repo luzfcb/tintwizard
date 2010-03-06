@@ -19,8 +19,6 @@
 #*************************************************************************/
 # Last modified: 6th March 2010
 
-# TODO - timezone support
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -34,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r176"
+VERSION = "SVN r177"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -78,6 +76,10 @@ ICONIFIED_ICON_SAT = "0"
 ICONIFIED_ICON_BRI = "0"
 CLOCK_FMT_1 = "%H:%M"
 CLOCK_FMT_2 = "%a %d %b"
+CLOCK_TOOLTIP = ""
+CLOCK_TIME1_TIMEZONE = ""
+CLOCK_TIME2_TIMEZONE = ""
+CLOCK_TOOLTIP_TIMEZONE = ""
 CLOCK_PADDING_X = "0"
 CLOCK_PADDING_Y = "0"
 CLOCK_LCLICK = ""
@@ -1068,14 +1070,27 @@ class TintWizardGUI(gtk.Window):
 		self.clock2FontButton.set_font_name(self.defaults["font"])
 		self.clock2FontButton.connect("font-set", self.changeOccurred)
 		self.tableClockDisplays.attach(self.clock2FontButton, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
+		
+		temp = gtk.Label("Tooltip Format")
+		temp.set_alignment(0, 0.5)
+		self.tableClockDisplays.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.clockTooltipFormat = gtk.Entry(50)
+		self.clockTooltipFormat.set_width_chars(20)
+		self.clockTooltipFormat.set_text(CLOCK_TOOLTIP)
+		self.clockTooltipFormat.connect("changed", self.changeOccurred)
+		self.tableClockDisplays.attach(self.clockTooltipFormat, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		self.clockTooltipCheckButton = gtk.CheckButton("Show")
+		self.clockTooltipCheckButton.set_active(True)
+		self.clockTooltipCheckButton.connect("toggled", self.changeOccurred)
+		self.tableClockDisplays.attach(self.clockTooltipCheckButton, 2, 3, 5, 6, xoptions=gtk.EXPAND)
+		
 		self.clockArea = gtk.ScrolledWindow()
 		self.clockBuf = gtk.TextBuffer()
 		self.clockTextView = gtk.TextView(self.clockBuf)
 		self.clockBuf.insert_at_cursor("%H 00-23 (24-hour)    %I 01-12 (12-hour)    %l 1-12 (12-hour)    %M 00-59 (minutes)\n%S 00-59 (seconds)    %P am/pm    %b Jan-Dec    %B January-December\n%a Sun-Sat    %A Sunday-Saturday    %d 01-31 (day)    %e 1-31 (day)\n%y 2 digit year, e.g. 09    %Y 4 digit year, e.g. 2009")
 		self.clockTextView.set_editable(False)
 		self.clockArea.add_with_viewport(self.clockTextView)
-		self.tableClockDisplays.attach(self.clockArea, 0, 3, 5, 6, xpadding=10)
+		self.tableClockDisplays.attach(self.clockArea, 0, 3, 6, 7, xpadding=10)
 
 		self.tableClockSettings = gtk.Table(rows=3, columns=3, homogeneous=False)
 		self.tableClockSettings.set_row_spacings(5)
@@ -1140,6 +1155,45 @@ class TintWizardGUI(gtk.Window):
 		self.clockRClick.set_text(CLOCK_RCLICK)
 		self.clockRClick.connect("changed", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockRClick, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Time 1 Timezone")
+		temp.set_alignment(0, 0.5)
+		self.tableClockSettings.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.clockTime1Timezone = gtk.Entry(50)
+		self.clockTime1Timezone.set_width_chars(20)
+		self.clockTime1Timezone.set_text(CLOCK_TIME1_TIMEZONE)
+		self.clockTime1Timezone.connect("changed", self.changeOccurred)
+		self.tableClockSettings.attach(self.clockTime1Timezone, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		self.clockTimezone1CheckButton = gtk.CheckButton("Show")
+		self.clockTimezone1CheckButton.set_active(False)
+		self.clockTimezone1CheckButton.connect("toggled", self.changeOccurred)
+		self.tableClockSettings.attach(self.clockTimezone1CheckButton, 2, 3, 5, 6, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Time 2 Timezone")
+		temp.set_alignment(0, 0.5)
+		self.tableClockSettings.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.clockTime2Timezone = gtk.Entry(50)
+		self.clockTime2Timezone.set_width_chars(20)
+		self.clockTime2Timezone.set_text(CLOCK_TIME2_TIMEZONE)
+		self.clockTime2Timezone.connect("changed", self.changeOccurred)
+		self.tableClockSettings.attach(self.clockTime2Timezone, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		self.clockTimezone2CheckButton = gtk.CheckButton("Show")
+		self.clockTimezone2CheckButton.set_active(False)
+		self.clockTimezone2CheckButton.connect("toggled", self.changeOccurred)
+		self.tableClockSettings.attach(self.clockTimezone2CheckButton, 2, 3, 6, 7, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Tooltip Timezone")
+		temp.set_alignment(0, 0.5)
+		self.tableClockSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
+		self.clockTooltipTimezone = gtk.Entry(50)
+		self.clockTooltipTimezone.set_width_chars(20)
+		self.clockTooltipTimezone.set_text(CLOCK_TOOLTIP_TIMEZONE)
+		self.clockTooltipTimezone.connect("changed", self.changeOccurred)
+		self.tableClockSettings.attach(self.clockTooltipTimezone, 1, 2, 7, 8, xoptions=gtk.EXPAND)
+		self.clockTimezoneTooltipCheckButton = gtk.CheckButton("Show")
+		self.clockTimezoneTooltipCheckButton.set_active(False)
+		self.clockTimezoneTooltipCheckButton.connect("toggled", self.changeOccurred)
+		self.tableClockSettings.attach(self.clockTimezoneTooltipCheckButton, 2, 3, 7, 8, xoptions=gtk.EXPAND)
 
 		# Tooltip Options
 		self.tableTooltip = gtk.Table(rows=7, columns=3, homogeneous=False)
@@ -1513,6 +1567,7 @@ class TintWizardGUI(gtk.Window):
 			"systray_sort": self.trayOrder,
 			"time1_format": self.clock1Format,
 			"time2_format": self.clock2Format,
+			"clock_tooltip": self.clockTooltipFormat,
 			"time1_font": self.clock1FontButton,
 			"time2_font": self.clock2FontButton,
 			"clock_font_color": (self.clockFontCol, self.clockFontColButton),
@@ -1520,6 +1575,9 @@ class TintWizardGUI(gtk.Window):
 			"clock_background_id": self.clockBg,
 			"clock_lclick_command": self.clockLClick,
 			"clock_rclick_command": self.clockRClick,
+			"time1_timezone": self.clockTime1Timezone,
+			"time2_timezone": self.clockTime2Timezone,
+			"clock_tooltip_timezone": self.clockTooltipTimezone,
 			"mouse_middle": self.mouseMiddle,
 			"mouse_right": self.mouseRight,
 			"mouse_scroll_up": self.mouseUp,
@@ -1920,8 +1978,8 @@ class TintWizardGUI(gtk.Window):
 			if self.clock2CheckButton.get_active():
 				self.configBuf.insert(self.configBuf.get_end_iter(), "time2_format = %s\n" % (self.clock2Format.get_text() if self.clock2Format.get_text() else CLOCK_FMT_2))
 				self.configBuf.insert(self.configBuf.get_end_iter(), "time2_font = %s\n" % (self.clock2FontButton.get_font_name()))
-			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_font_color = %s %s\n" % (self.getHexFromWidget(self.clockFontColButton),
-															int(self.clockFontColButton.get_alpha() / 65535.0 * 100)))
+			if self.clockTooltipCheckButton.get_active():
+				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_tooltip = %s\n" % (self.clockTooltipFormat.get_text() if self.clockTooltipFormat.get_text() else CLOCK_TOOLTIP))
 			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_padding = %s %s\n" % (self.clockPadX.get_text() if self.clockPadX.get_text() else CLOCK_PADDING_X,
 															self.clockPadY.get_text() if self.clockPadY.get_text() else CLOCK_PADDING_Y))
 			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_background_id = %s\n" % (self.clockBg.get_active()))
@@ -1929,7 +1987,14 @@ class TintWizardGUI(gtk.Window):
 				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_lclick_command = %s\n" % (self.clockLClick.get_text()))
 			if self.clockRClick.get_text():
 				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_rclick_command = %s\n" % (self.clockRClick.get_text()))
-
+			if self.clockTimezone1CheckButton.get_active():
+				self.configBuf.insert(self.configBuf.get_end_iter(), "time1_timezone = %s\n" % (self.clockTime1Timezone.get_text() if self.clockTime1Timezone.get_text() else CLOCK_TIME1_TIMEZONE))
+			if self.clockTimezone2CheckButton.get_active():
+				self.configBuf.insert(self.configBuf.get_end_iter(), "time2_timezone = %s\n" % (self.clockTime2Timezone.get_text() if self.clockTime2Timezone.get_text() else CLOCK_TIME2_TIMEZONE))
+			if self.clockTimezoneTooltipCheckButton.get_active():
+				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_tooltip_timezone = %s\n" % (self.clockTooltipTimezone.get_text() if self.clockTooltipTimezone.get_text() else CLOCK_TOOLTIP_TIMEZONE))
+			
+			
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Tooltips\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip = %s\n" % int(self.tooltipShow.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "tooltip_padding = %s %s\n" % (self.tooltipPadX.get_text() if self.tooltipPadX.get_text() else TOOLTIP_PADDING_Y,
@@ -2149,6 +2214,8 @@ class TintWizardGUI(gtk.Window):
 		self.clock1FontButton.set_font_name(self.defaults["font"])
 		self.clock2Format.set_text(CLOCK_FMT_2)
 		self.clock2CheckButton.set_active(True)
+		self.clockTooltipFormat.set_text(CLOCK_TOOLTIP)
+		self.clockTooltipCheckButton.set_active(False)
 		self.clock2FontButton.set_font_name(self.defaults["font"])
 		self.clockFontColButton.set_alpha(65535)
 		self.clockFontColButton.set_color(gtk.gdk.color_parse(self.defaults["fgColor"]))
@@ -2158,6 +2225,12 @@ class TintWizardGUI(gtk.Window):
 		self.clockBg.set_active(0)
 		self.clockLClick.set_text(CLOCK_LCLICK)
 		self.clockRClick.set_text(CLOCK_RCLICK)
+		self.clockTime1Timezone.set_text(CLOCK_TIME1_TIMEZONE)
+		self.clockTimezone1CheckButton.set_active(False)
+		self.clockTime2Timezone.set_text(CLOCK_TIME2_TIMEZONE)
+		self.clockTimezone2CheckButton.set_active(False)
+		self.clockTooltipTimezone.set_text(CLOCK_TOOLTIP_TIMEZONE)
+		self.clockTimezoneTooltipCheckButton.set_active(False)
 		# Tooltips
 		self.tooltipShow.set_active(False)
 		self.tooltipPadX.set_text(TOOLTIP_PADDING_X)
@@ -2314,6 +2387,14 @@ class TintWizardGUI(gtk.Window):
 				self.parseProp(self.propUI[e], s[1], True, "time1")
 			elif e == "time2_format":
 				self.parseProp(self.propUI[e], s[1], True, "time2")
+			elif e == "clock_tooltip":
+				self.parseProp(self.propUI[e], s[1], True, "clock_tooltip")
+			elif e == "time1_timezone":
+				self.parseProp(self.propUI[e], s[1], True, "time1_timezone")
+			elif e == "time2_timezone":
+				self.parseProp(self.propUI[e], s[1], True, "time2_timezone")
+			elif e == "clock_tooltip_timezone":
+				self.parseProp(self.propUI[e], s[1], True, "tooltip_timezone")
 			elif e == "systray_padding":
 				self.parseProp(self.propUI[e], s[1], True, "tray")
 			elif e == "taskbar_active_background_id":
@@ -2334,6 +2415,15 @@ class TintWizardGUI(gtk.Window):
 			elif propType == "time2":
 				self.clockCheckButton.set_active(True)
 				self.clock2CheckButton.set_active(True)
+			elif propType == "clock_tooltip":
+				self.clockCheckButton.set_active(True)
+				self.clockTooltipCheckButton.set_active(True)
+			elif propType == "time1_timezone":
+				self.clockTimezone1CheckButton.set_active(True)
+			elif propType == "time2_timezone":
+				self.clockTimezone2CheckButton.set_active(True)
+			elif propType == "tooltip_timezone":
+				self.clockTimezoneTooltipCheckButton.set_active(True)
 			elif propType == "tray":
 				self.trayShow.set_active(True)
 			elif propType == "activeBg":
@@ -2441,6 +2531,10 @@ class TintWizardGUI(gtk.Window):
 		self.clockCheckButton.set_active(False)
 		self.clock1CheckButton.set_active(False)
 		self.clock2CheckButton.set_active(False)
+		self.clockTooltipCheckButton.set_active(False)
+		self.clockTimezone1CheckButton.set_active(False)
+		self.clockTimezone2CheckButton.set_active(False)
+		self.clockTimezoneTooltipCheckButton.set_active(False)
 		self.trayShow.set_active(False)
 		self.taskbarActiveBgEnable.set_active(False)
 
