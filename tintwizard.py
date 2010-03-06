@@ -35,13 +35,14 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r179"
+VERSION = "SVN r180"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
 # Default values for text entry fields
 BG_ROUNDING = "0"
 BG_BORDER = "0"
+REAL_TRANSPARENCY = "0"
 PANEL_SIZE_X = "0"
 PANEL_SIZE_Y = "40"
 PANEL_MARGIN_X = "0"
@@ -490,61 +491,73 @@ class TintWizardGUI(gtk.Window):
 		self.panelDock.set_active(False)
 		self.panelDock.connect("toggled", self.changeOccurred)
 		self.tablePanelSettings.attach(self.panelDock, 1, 2, 1, 2, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
+		
+		temp = gtk.Label("Panel Layer")
 		temp.set_alignment(0, 0.5)
 		self.tablePanelSettings.attach(temp, 0, 1, 2, 3, xpadding=10)
+		self.panelLayer = gtk.combo_box_new_text()
+		self.panelLayer.append_text("bottom")
+		self.panelLayer.append_text("top")
+		self.panelLayer.append_text("normal")
+		self.panelLayer.set_active(0)
+		self.panelLayer.connect("changed", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelLayer, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		
+		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.panelMonitor = gtk.Entry(6)
 		self.panelMonitor.set_width_chars(8)
 		self.panelMonitor.set_text(PANEL_MONITOR)
 		self.panelMonitor.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelMonitor, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelMonitor, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Autohide Panel")
 		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.panelAutohide = gtk.CheckButton()
 		self.panelAutohide.set_active(False)
 		self.panelAutohide.connect("toggled", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohide, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohide, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Autohide Show Timeout (seconds)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.panelAutohideShow = gtk.Entry(6)
 		self.panelAutohideShow.set_width_chars(8)
 		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
 		self.panelAutohideShow.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideShow, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohideShow, 1, 2, 5, 6, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Autohide Hide Timeout (seconds)")
 		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 6, 7, xpadding=10)
 		self.panelAutohideHide = gtk.Entry(6)
 		self.panelAutohideHide.set_width_chars(8)
 		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
 		self.panelAutohideHide.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideHide, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohideHide, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Autohide Hidden Height")
 		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
 		self.panelAutohideHeight = gtk.Entry(6)
 		self.panelAutohideHeight.set_width_chars(8)
 		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
 		self.panelAutohideHeight.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideHeight, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohideHeight, 1, 2, 7, 8, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Autohide Strut Policy")
 		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
+		self.tablePanelSettings.attach(temp, 0, 1, 8, 9, xpadding=10)
 		self.panelAutohideStrut = gtk.combo_box_new_text()
 		self.panelAutohideStrut.append_text("none")
 		self.panelAutohideStrut.append_text("minimum")
 		self.panelAutohideStrut.append_text("follow_size")
 		self.panelAutohideStrut.set_active(0)
 		self.panelAutohideStrut.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 8, 9, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=5, columns=3, homogeneous=False)
@@ -1535,6 +1548,7 @@ class TintWizardGUI(gtk.Window):
 			"panel_margin": (self.panelMarginX, self.panelMarginY),
 			"panel_padding": (self.panelPadX, self.panelPadY, self.panelSpacing),
 			"wm_menu": self.panelMenu,
+			"panel_layer": self.panelLayer,
 			"panel_dock": self.panelDock,
 			"panel_background_id": self.panelBg,
 			"autohide": self.panelAutohide,
@@ -1707,7 +1721,48 @@ class TintWizardGUI(gtk.Window):
 
 		if not init:
 			self.changeOccurred()
+	
+	def addBgDefs(self, bgDefs):
+		"""Add interface elements for a list of background style definitions. bgDefs
+		should be a list containing dictionaries with the following keys: rounded,
+		border_width, background_color, border_color"""
+		for d in bgDefs:
+			self.addBg()
 
+			for child in self.bgs[-1].get_children():
+				if child.get_name() == "rounded":
+					child.set_text(d["rounded"])
+				elif child.get_name() == "border":
+					child.set_text(d["border_width"])
+				elif child.get_name() == "bgColEntry":
+					child.set_text(d["background_color"].split(" ")[0].strip())
+					child.activate()
+				elif child.get_name() == "borderColEntry":
+					child.set_text(d["border_color"].split(" ")[0].strip())
+					child.activate()
+				elif child.get_name() == "bgCol":
+					list = d["background_color"].split(" ")
+					if len(list) > 1:
+						child.set_alpha(int(int(list[1].strip()) * 65535 / 100.0))
+					else:
+						child.set_alpha(65535)
+				elif child.get_name() == "borderCol":
+					list = d["border_color"].split(" ")
+					if len(list) > 1:
+						child.set_alpha(int(int(list[1].strip()) * 65535 / 100.0))
+					else:
+						child.set_alpha(65535)
+
+			newId = len(self.bgs)
+
+			self.bgNotebook.append_page(self.bgs[newId-1], gtk.Label("Background ID %d" % (newId)))
+
+			self.bgNotebook.show_all()
+
+			self.updateComboBoxes(newId-1, "add")
+
+			self.bgNotebook.set_current_page(newId)
+	
 	def apply(self, widget, event=None, confirmChange=True):
 		"""Applies the current config to tint2."""
 		# Check if tint2 is running
@@ -1907,6 +1962,7 @@ class TintWizardGUI(gtk.Window):
 															self.panelSpacing.get_text() if self.panelSpacing.get_text() else TASKBAR_SPACING))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_dock = %s\n" % int(self.panelDock.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "wm_menu = %s\n" % int(self.panelMenu.get_active()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_layer = %s\n" % (self.panelLayer.get_active_text()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "panel_background_id = %s\n" % (self.panelBg.get_active()))
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Panel Autohide\n")
@@ -2116,7 +2172,261 @@ class TintWizardGUI(gtk.Window):
 			webbrowser.open("http://code.google.com/p/tintwizard/wiki/Help")
 		except:
 			errorDialog(self, "Your default web-browser could not be opened.\nPlease visit http://code.google.com/p/tintwizard/wiki/Help")
+	
+	def main(self):
+		"""Enters the main loop."""
+		gtk.main()
+	
+	def new(self, action=None):
+		"""Prepares a new config."""
+		if self.toSave:
+			self.savePrompt()
+		
+		self.toSave = True
+		self.filename = None
 
+		self.resetConfig()
+
+		self.generateConfig()
+		self.updateStatusBar("New Config File [*]")
+
+	def openDef(self, widget=None):
+		"""Opens the default tint2 config."""
+		self.openFile(default=True)
+
+	def openFile(self, widget=None, default=False):
+		"""Reads from a config file. If default=True, open the tint2 default config."""
+		self.new()
+
+		if not default:
+			chooser = gtk.FileChooserDialog("Open Config File", self, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+			chooser.set_default_response(gtk.RESPONSE_OK)
+
+			if self.curDir != None:
+				chooser.set_current_folder(self.curDir)
+
+			chooserFilter = gtk.FileFilter()
+			chooserFilter.set_name("All files")
+			chooserFilter.add_pattern("*")
+			chooser.add_filter(chooserFilter)
+			chooser.show()
+
+			response = chooser.run()
+
+			if response == gtk.RESPONSE_OK:
+				self.filename = chooser.get_filename()
+				self.curDir = os.path.dirname(self.filename)
+			else:
+				chooser.destroy()
+				return
+
+			chooser.destroy()
+		else:
+			self.filename = os.path.expandvars("$HOME/.config/tint2/tint2rc")
+			self.curDir = os.path.expandvars("$HOME/.config/tint2")
+
+		self.readTint2Config()
+		self.generateConfig()
+		self.updateStatusBar()
+
+	def parseBgs(self, string):
+		"""Parses the background definitions from a string."""
+		s = string.split("\n")
+
+		bgDefs = []
+		cur = -1
+		bgKeys = ["border_width", "background_color", "border_color"]
+		newString = ""
+
+		for line in s:
+			data = [token.strip() for token in line.split("=")]
+
+			if data[0] == "rounded":					# It may be considered bad practice to
+				bgDefs += [{"rounded": data[1]}]		# find each style definition with an
+			elif data[0] in bgKeys:						# arbitrary value, but tint2 does the same.
+				bgDefs[cur][data[0]] = data[1]			# This means that any existing configs must
+			else:										# start with 'rounded'.
+				newString += "%s\n" % line
+
+		self.addBgDefs(bgDefs)
+
+		return newString
+
+	def parseConfig(self, string):
+		"""Parses the contents of a config file."""
+		for line in string.split("\n"):
+			s = line.split("=")												# Create a list with KEY and VALUE
+
+			e = s[0].strip()												# Strip whitespace from KEY
+
+			if e == "time1_format":											# Set the VALUE of KEY
+				self.parseProp(self.propUI[e], s[1], True, "time1")
+			elif e == "time2_format":
+				self.parseProp(self.propUI[e], s[1], True, "time2")
+			elif e == "clock_tooltip":
+				self.parseProp(self.propUI[e], s[1], True, "clock_tooltip")
+			elif e == "time1_timezone":
+				self.parseProp(self.propUI[e], s[1], True, "time1_timezone")
+			elif e == "time2_timezone":
+				self.parseProp(self.propUI[e], s[1], True, "time2_timezone")
+			elif e == "clock_tooltip_timezone":
+				self.parseProp(self.propUI[e], s[1], True, "tooltip_timezone")
+			elif e == "systray_padding":
+				self.parseProp(self.propUI[e], s[1], True, "tray")
+			elif e == "taskbar_active_background_id":
+				self.parseProp(self.propUI[e], s[1], True, "activeBg")
+			else:
+				if self.propUI.has_key(e):
+					self.parseProp(self.propUI[e], s[1])
+
+	def parseProp(self, prop, string, special=False, propType=""):
+		"""Parses a variable definition from the conf file and updates the correct UI widget."""
+		string = string.strip()										# Remove whitespace from the VALUE
+		eType = type(prop)											# Get widget type
+
+		if special:													# 'Special' properties are those which are optional
+			if propType == "time1":
+				self.clockCheckButton.set_active(True)
+				self.clock1CheckButton.set_active(True)
+			elif propType == "time2":
+				self.clockCheckButton.set_active(True)
+				self.clock2CheckButton.set_active(True)
+			elif propType == "clock_tooltip":
+				self.clockCheckButton.set_active(True)
+				self.clockTooltipCheckButton.set_active(True)
+			elif propType == "time1_timezone":
+				self.clockTimezone1CheckButton.set_active(True)
+			elif propType == "time2_timezone":
+				self.clockTimezone2CheckButton.set_active(True)
+			elif propType == "tooltip_timezone":
+				self.clockTimezoneTooltipCheckButton.set_active(True)
+			elif propType == "tray":
+				self.trayShow.set_active(True)
+			elif propType == "activeBg":
+				self.taskbarActiveBgEnable.set_active(True)
+
+		if eType == gtk.Entry:
+			prop.set_text(string)
+			prop.activate()
+		elif eType == gtk.ComboBox:
+			# This allows us to select the correct combo-box value.
+			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
+							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
+							"desktop_left", "desktop_right", "horizontal", "vertical", "ascending", "descending",
+							"left2right", "right2left", "next_task", "prev_task", "minimum", "follow_size", "normal"]:
+				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "ascending"]:
+					i = 0
+				elif string in ["top", "right", "multi_desktop", "close", "vertical", "descending", "minimum"]:
+					i = 1
+				elif string in ["center", "single_monitor", "toggle", "left2right", "follow_size", "normal"]:
+					i = 2
+				elif string in ["right2left"]:
+					i = 3
+				else:
+					i = ["none", "close", "toggle", "iconify", "shade", "toggle_iconify", "maximize_restore",
+						"desktop_left", "desktop_right", "next_task", "prev_task"].index(string)
+
+				prop.set_active(i)
+			else:
+				prop.set_active(int(string))
+		elif eType == gtk.CheckButton:
+			prop.set_active(bool(int(string)))
+		elif eType == gtk.FontButton:
+			prop.set_font_name(string)
+		elif eType == gtk.ColorButton:
+			prop.set_alpha(int(int(string) * 65535 / 100.0))
+		elif eType == tuple:									# If a property has more than 1 value, for example the x and y co-ords
+			s = string.split(" ")								# of the padding properties, then just we use recursion to set the
+			for i in range(len(prop)):							# value of each associated widget.
+				if i >= len(s):
+					self.parseProp(prop[i], "0")
+				else:
+					self.parseProp(prop[i], s[i])
+
+	def quit(self, widget, event=None):
+		"""Asks if user would like to save file before quitting, then quits the program."""
+		if self.toSave:
+			if self.oneConfigFile:
+				response = gtk.RESPONSE_YES
+			else:
+				dialog = gtk.Dialog("Save config?", self, gtk.DIALOG_MODAL, (gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, gtk.RESPONSE_NO, gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+				dialog.get_content_area().add(gtk.Label("Save config before quitting?"))
+				dialog.get_content_area().set_size_request(300, 100)
+				dialog.show_all()
+				response = dialog.run()
+				dialog.destroy()
+
+			if response == gtk.RESPONSE_CANCEL:
+				return True							# Return True to stop it quitting when we hit "Cancel"
+			elif response == gtk.RESPONSE_NO:
+				gtk.main_quit()
+			elif response == gtk.RESPONSE_YES:
+				self.save()
+				gtk.main_quit()
+		else:
+			gtk.main_quit()
+
+	def readConf(self):
+		"""Reads the tintwizard configuration file - NOT tint2 config files."""
+		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None, "dir": None}
+
+		if self.oneConfigFile:
+			# don't need tintwizard.conf
+			return
+
+		pathName = os.path.dirname(sys.argv[0])
+
+		if pathName != "":
+			pathName += "/"
+
+		if not os.path.exists(pathName + "tintwizard.conf"):
+			self.writeConf()
+			return
+
+		f = open(pathName + "tintwizard.conf", "r")
+
+		for line in f:
+			if "=" in line:
+				l = line.split("=")
+
+				if self.defaults.has_key(l[0].strip()):
+					self.defaults[l[0].strip()] = l[1].strip()
+
+	def readTint2Config(self):
+		"""Reads in from a config file."""
+		f = open(self.filename, "r")
+
+		string = ""
+
+		for line in f:
+			if (line[0] != "#") and (len(line) > 2):
+				string += line
+
+		f.close()
+
+		# Deselect the optional stuff, and we'll re-check them if the config has them enabled
+		self.clockCheckButton.set_active(False)
+		self.clock1CheckButton.set_active(False)
+		self.clock2CheckButton.set_active(False)
+		self.clockTooltipCheckButton.set_active(False)
+		self.clockTimezone1CheckButton.set_active(False)
+		self.clockTimezone2CheckButton.set_active(False)
+		self.clockTimezoneTooltipCheckButton.set_active(False)
+		self.trayShow.set_active(False)
+		self.taskbarActiveBgEnable.set_active(False)
+
+		# Remove all background styles so we can create new ones as we read them
+		for i in range(len(self.bgs)):
+			self.delBgClick(None, False)
+
+		# As we parse background definitions, we build a new string
+		# without the background related stuff. This means we don't
+		# have to read through background defs AGAIN when parsing
+		# the other stuff.
+		noBgDefs = self.parseBgs(string)
+
+		self.parseConfig(noBgDefs)
+	
 	def reportBug(self, action=None):
 		"""Opens the bug report page in the default web browser."""
 		try:
@@ -2124,10 +2434,7 @@ class TintWizardGUI(gtk.Window):
 		except:
 			errorDialog(self, "Your default web-browser could not be opened.\nPlease visit http://code.google.com/p/tintwizard/issues/entry")
 
-	def main(self):
-		"""Enters the main loop."""
-		gtk.main()
-
+	
 	def resetConfig(self):
 		"""Resets all the widgets to their default values."""
 		# Backgrounds
@@ -2153,6 +2460,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelBg.set_active(0)
 		self.panelMenu.set_active(0)
 		self.panelDock.set_active(0)
+		self.panelLayer.set_active(0)
 		self.panelMonitor.set_text(PANEL_MONITOR)
 		self.panelAutohide.set_active(0)
 		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
@@ -2267,297 +2575,7 @@ class TintWizardGUI(gtk.Window):
 		self.batteryPadX.set_text(BATTERY_PADDING_Y)
 		self.batteryPadY.set_text(BATTERY_PADDING_Y)
 		self.batteryBg.set_active(0)
-
-	def new(self, action=None):
-		"""Prepares a new config."""
-		if self.toSave:
-			self.savePrompt()
-
-		self.toSave = True
-		self.filename = None
-
-		self.resetConfig()
-
-		self.generateConfig()
-		self.updateStatusBar("New Config File [*]")
-
-	def openDef(self, widget=None):
-		"""Opens the default tint2 config."""
-		self.openFile(default=True)
-
-	def openFile(self, widget=None, default=False):
-		"""Reads from a config file. If default=True, open the tint2 default config."""
-		self.new()
-
-		if not default:
-			chooser = gtk.FileChooserDialog("Open Config File", self, gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-			chooser.set_default_response(gtk.RESPONSE_OK)
-
-			if self.curDir != None:
-				chooser.set_current_folder(self.curDir)
-
-			chooserFilter = gtk.FileFilter()
-			chooserFilter.set_name("All files")
-			chooserFilter.add_pattern("*")
-			chooser.add_filter(chooserFilter)
-			chooser.show()
-
-			response = chooser.run()
-
-			if response == gtk.RESPONSE_OK:
-				self.filename = chooser.get_filename()
-				self.curDir = os.path.dirname(self.filename)
-			else:
-				chooser.destroy()
-				return
-
-			chooser.destroy()
-		else:
-			self.filename = os.path.expandvars("$HOME/.config/tint2/tint2rc")
-			self.curDir = os.path.expandvars("$HOME/.config/tint2")
-
-		self.readTint2Config()
-		self.generateConfig()
-		self.updateStatusBar()
-
-	def addBgDefs(self, bgDefs):
-		"""Add interface elements for a list of background style definitions. bgDefs
-		should be a list containing dictionaries with the following keys: rounded,
-		border_width, background_color, border_color"""
-		for d in bgDefs:
-			self.addBg()
-
-			for child in self.bgs[-1].get_children():
-				if child.get_name() == "rounded":
-					child.set_text(d["rounded"])
-				elif child.get_name() == "border":
-					child.set_text(d["border_width"])
-				elif child.get_name() == "bgColEntry":
-					child.set_text(d["background_color"].split(" ")[0].strip())
-					child.activate()
-				elif child.get_name() == "borderColEntry":
-					child.set_text(d["border_color"].split(" ")[0].strip())
-					child.activate()
-				elif child.get_name() == "bgCol":
-					list = d["background_color"].split(" ")
-					if len(list) > 1:
-						child.set_alpha(int(int(list[1].strip()) * 65535 / 100.0))
-					else:
-						child.set_alpha(65535)
-				elif child.get_name() == "borderCol":
-					list = d["border_color"].split(" ")
-					if len(list) > 1:
-						child.set_alpha(int(int(list[1].strip()) * 65535 / 100.0))
-					else:
-						child.set_alpha(65535)
-
-			newId = len(self.bgs)
-
-			self.bgNotebook.append_page(self.bgs[newId-1], gtk.Label("Background ID %d" % (newId)))
-
-			self.bgNotebook.show_all()
-
-			self.updateComboBoxes(newId-1, "add")
-
-			self.bgNotebook.set_current_page(newId)
-
-	def parseBgs(self, string):
-		"""Parses the background definitions from a string."""
-		s = string.split("\n")
-
-		bgDefs = []
-		cur = -1
-		bgKeys = ["border_width", "background_color", "border_color"]
-		newString = ""
-
-		for line in s:
-			data = [token.strip() for token in line.split("=")]
-
-			if data[0] == "rounded":					# It may be considered bad practice to
-				bgDefs += [{"rounded": data[1]}]		# find each style definition with an
-			elif data[0] in bgKeys:						# arbitrary value, but tint2 does the same.
-				bgDefs[cur][data[0]] = data[1]			# This means that any existing configs must
-			else:										# start with 'rounded'.
-				newString += "%s\n" % line
-
-		self.addBgDefs(bgDefs)
-
-		return newString
-
-	def parseConfig(self, string):
-		"""Parses the contents of a config file."""
-		for line in string.split("\n"):
-			s = line.split("=")												# Create a list with KEY and VALUE
-
-			e = s[0].strip()												# Strip whitespace from KEY
-
-			if e == "time1_format":											# Set the VALUE of KEY
-				self.parseProp(self.propUI[e], s[1], True, "time1")
-			elif e == "time2_format":
-				self.parseProp(self.propUI[e], s[1], True, "time2")
-			elif e == "clock_tooltip":
-				self.parseProp(self.propUI[e], s[1], True, "clock_tooltip")
-			elif e == "time1_timezone":
-				self.parseProp(self.propUI[e], s[1], True, "time1_timezone")
-			elif e == "time2_timezone":
-				self.parseProp(self.propUI[e], s[1], True, "time2_timezone")
-			elif e == "clock_tooltip_timezone":
-				self.parseProp(self.propUI[e], s[1], True, "tooltip_timezone")
-			elif e == "systray_padding":
-				self.parseProp(self.propUI[e], s[1], True, "tray")
-			elif e == "taskbar_active_background_id":
-				self.parseProp(self.propUI[e], s[1], True, "activeBg")
-			else:
-				if self.propUI.has_key(e):
-					self.parseProp(self.propUI[e], s[1])
-
-	def parseProp(self, prop, string, special=False, propType=""):
-		"""Parses a variable definition from the conf file and updates the correct UI widget."""
-		string = string.strip()										# Remove whitespace from the VALUE
-		eType = type(prop)											# Get widget type
-
-		if special:													# 'Special' properties are those which are optional
-			if propType == "time1":
-				self.clockCheckButton.set_active(True)
-				self.clock1CheckButton.set_active(True)
-			elif propType == "time2":
-				self.clockCheckButton.set_active(True)
-				self.clock2CheckButton.set_active(True)
-			elif propType == "clock_tooltip":
-				self.clockCheckButton.set_active(True)
-				self.clockTooltipCheckButton.set_active(True)
-			elif propType == "time1_timezone":
-				self.clockTimezone1CheckButton.set_active(True)
-			elif propType == "time2_timezone":
-				self.clockTimezone2CheckButton.set_active(True)
-			elif propType == "tooltip_timezone":
-				self.clockTimezoneTooltipCheckButton.set_active(True)
-			elif propType == "tray":
-				self.trayShow.set_active(True)
-			elif propType == "activeBg":
-				self.taskbarActiveBgEnable.set_active(True)
-
-		if eType == gtk.Entry:
-			prop.set_text(string)
-			prop.activate()
-		elif eType == gtk.ComboBox:
-			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
-							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
-							"desktop_left", "desktop_right", "horizontal", "vertical", "ascending", "descending",
-							"left2right", "right2left", "next_task", "prev_task", "minimum", "follow_size"]:
-				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "ascending"]:
-					i = 0
-				elif string in ["top", "right", "multi_desktop", "close", "vertical", "descending", "minimum"]:
-					i = 1
-				elif string in ["center", "single_monitor", "toggle", "left2right", "follow_size"]:
-					i = 2
-				elif string in ["right2left"]:
-					i = 3
-				else:
-					i = ["none", "close", "toggle", "iconify", "shade", "toggle_iconify", "maximize_restore",
-						"desktop_left", "desktop_right", "next_task", "prev_task"].index(string)
-
-				prop.set_active(i)
-			else:
-				prop.set_active(int(string))
-		elif eType == gtk.CheckButton:
-			prop.set_active(bool(int(string)))
-		elif eType == gtk.FontButton:
-			prop.set_font_name(string)
-		elif eType == gtk.ColorButton:
-			prop.set_alpha(int(int(string) * 65535 / 100.0))
-		elif eType == tuple:									# If a property has more than 1 value, for example the x and y co-ords
-			s = string.split(" ")								# of the padding properties, then just we use recursion to set the
-			for i in range(len(prop)):							# value of each associated widget.
-				if i >= len(s):
-					self.parseProp(prop[i], "0")
-				else:
-					self.parseProp(prop[i], s[i])
-
-	def quit(self, widget, event=None):
-		"""Asks if user would like to save file before quitting, then quits the program."""
-		if self.toSave:
-			if self.oneConfigFile:
-				response = gtk.RESPONSE_YES
-			else:
-				dialog = gtk.Dialog("Save config?", self, gtk.DIALOG_MODAL, (gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, gtk.RESPONSE_NO, gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-				dialog.get_content_area().add(gtk.Label("Save config before quitting?"))
-				dialog.get_content_area().set_size_request(300, 100)
-				dialog.show_all()
-				response = dialog.run()
-				dialog.destroy()
-
-			if response == gtk.RESPONSE_CANCEL:
-				return True							# Return True to stop it quitting when we hit "Cancel"
-			elif response == gtk.RESPONSE_NO:
-				gtk.main_quit()
-			elif response == gtk.RESPONSE_YES:
-				self.save()
-				gtk.main_quit()
-		else:
-			gtk.main_quit()
-
-	def readConf(self):
-		"""Reads the tintwizard configuration file - NOT tint2 config files."""
-		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None, "dir": None}
-
-		if self.oneConfigFile:
-			# don't need tintwizard.conf
-			return
-
-		pathName = os.path.dirname(sys.argv[0])
-
-		if pathName != "":
-			pathName += "/"
-
-		if not os.path.exists(pathName + "tintwizard.conf"):
-			self.writeConf()
-			return
-
-		f = open(pathName + "tintwizard.conf", "r")
-
-		for line in f:
-			if "=" in line:
-				l = line.split("=")
-
-				if self.defaults.has_key(l[0].strip()):
-					self.defaults[l[0].strip()] = l[1].strip()
-
-	def readTint2Config(self):
-		"""Reads in from a config file."""
-		f = open(self.filename, "r")
-
-		string = ""
-
-		for line in f:
-			if (line[0] != "#") and (len(line) > 2):
-				string += line
-
-		f.close()
-
-		# Deselect the optional stuff, and we'll re-check them if the config has them enabled
-		self.clockCheckButton.set_active(False)
-		self.clock1CheckButton.set_active(False)
-		self.clock2CheckButton.set_active(False)
-		self.clockTooltipCheckButton.set_active(False)
-		self.clockTimezone1CheckButton.set_active(False)
-		self.clockTimezone2CheckButton.set_active(False)
-		self.clockTimezoneTooltipCheckButton.set_active(False)
-		self.trayShow.set_active(False)
-		self.taskbarActiveBgEnable.set_active(False)
-
-		# Remove all background styles so we can create new ones as we read them
-		for i in range(len(self.bgs)):
-			self.delBgClick(None, False)
-
-		# As we parse background definitions, we build a new string
-		# without the background related stuff. This means we don't
-		# have to read through background defs AGAIN when parsing
-		# the other stuff.
-		noBgDefs = self.parseBgs(string)
-
-		self.parseConfig(noBgDefs)
-
+	
 	def save(self, widget=None, event=None):
 		"""Saves the generated config file."""
 
