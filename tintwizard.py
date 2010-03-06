@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN 0.3"
+VERSION = "0.3"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -2822,5 +2822,9 @@ def trunc(n):
 
 # Direct execution of application
 if __name__ == "__main__":
+	if len(sys.argv) > 1 and sys.argv[1] == "-version":
+		print NAME, VERSION
+		exit()
+	
 	tw = TintWizardGUI()
 	tw.main()
