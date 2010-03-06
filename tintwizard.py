@@ -19,6 +19,9 @@
 #*************************************************************************/
 # Last modified: 6th March 2010
 
+# TODO panel layer
+# TODO system icon size and ASB
+
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -32,7 +35,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r178"
+VERSION = "SVN r179"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -1165,7 +1168,7 @@ class TintWizardGUI(gtk.Window):
 		self.clockTime1Timezone.set_text(CLOCK_TIME1_TIMEZONE)
 		self.clockTime1Timezone.connect("changed", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockTime1Timezone, 1, 2, 5, 6, xoptions=gtk.EXPAND)
-		self.clockTimezone1CheckButton = gtk.CheckButton("Show")
+		self.clockTimezone1CheckButton = gtk.CheckButton("Enable")
 		self.clockTimezone1CheckButton.set_active(False)
 		self.clockTimezone1CheckButton.connect("toggled", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockTimezone1CheckButton, 2, 3, 5, 6, xoptions=gtk.EXPAND)
@@ -1178,7 +1181,7 @@ class TintWizardGUI(gtk.Window):
 		self.clockTime2Timezone.set_text(CLOCK_TIME2_TIMEZONE)
 		self.clockTime2Timezone.connect("changed", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockTime2Timezone, 1, 2, 6, 7, xoptions=gtk.EXPAND)
-		self.clockTimezone2CheckButton = gtk.CheckButton("Show")
+		self.clockTimezone2CheckButton = gtk.CheckButton("Enable")
 		self.clockTimezone2CheckButton.set_active(False)
 		self.clockTimezone2CheckButton.connect("toggled", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockTimezone2CheckButton, 2, 3, 6, 7, xoptions=gtk.EXPAND)
@@ -1191,7 +1194,7 @@ class TintWizardGUI(gtk.Window):
 		self.clockTooltipTimezone.set_text(CLOCK_TOOLTIP_TIMEZONE)
 		self.clockTooltipTimezone.connect("changed", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockTooltipTimezone, 1, 2, 7, 8, xoptions=gtk.EXPAND)
-		self.clockTimezoneTooltipCheckButton = gtk.CheckButton("Show")
+		self.clockTimezoneTooltipCheckButton = gtk.CheckButton("Enable")
 		self.clockTimezoneTooltipCheckButton.set_active(False)
 		self.clockTimezoneTooltipCheckButton.connect("toggled", self.changeOccurred)
 		self.tableClockSettings.attach(self.clockTimezoneTooltipCheckButton, 2, 3, 7, 8, xoptions=gtk.EXPAND)
@@ -1979,6 +1982,10 @@ class TintWizardGUI(gtk.Window):
 			if self.clock2CheckButton.get_active():
 				self.configBuf.insert(self.configBuf.get_end_iter(), "time2_format = %s\n" % (self.clock2Format.get_text() if self.clock2Format.get_text() else CLOCK_FMT_2))
 				self.configBuf.insert(self.configBuf.get_end_iter(), "time2_font = %s\n" % (self.clock2FontButton.get_font_name()))
+			
+			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_font_color = %s %s\n" % (self.getHexFromWidget(self.clockFontColButton),
+															int(self.clockFontColButton.get_alpha() / 65535.0 * 100)))
+		
 			if self.clockTooltipCheckButton.get_active():
 				self.configBuf.insert(self.configBuf.get_end_iter(), "clock_tooltip = %s\n" % (self.clockTooltipFormat.get_text() if self.clockTooltipFormat.get_text() else CLOCK_TOOLTIP))
 			self.configBuf.insert(self.configBuf.get_end_iter(), "clock_padding = %s %s\n" % (self.clockPadX.get_text() if self.clockPadX.get_text() else CLOCK_PADDING_X,
