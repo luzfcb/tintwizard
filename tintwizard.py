@@ -20,7 +20,6 @@
 # Last modified: 6th March 2010
 
 # TODO - timezone support
-# TODO - urgent / iconified icon ASB
 
 import pygtk
 pygtk.require('2.0')
@@ -35,7 +34,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r175"
+VERSION = "SVN r176"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -344,15 +343,6 @@ class TintWizardGUI(gtk.Window):
 						("Help",gtk.STOCK_HELP, "_Help", None, "Get help with tintwizard", self.help),
 						("Report Bug",None, "Report Bug", None, "Report a problem with tintwizard", self.reportBug),
 						("About",gtk.STOCK_ABOUT, "_About Tint Wizard", None, "Find out more about Tint Wizard", self.about)])
-
-		# Experimental stuff
-		# TODO - is this really needed?
-		
-		#actions = self.ag.list_actions()
-		
-		#for action in actions:
-		#	action.connect("focus-in-event", self.mouseoverCallback)
-
 
 		# Add main UI
 		self.uiManager.insert_action_group(self.ag, -1)
@@ -714,7 +704,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskDefault.set_row_spacings(5)
 		self.tableTaskDefault.set_col_spacings(5)
 		
-		temp = gtk.Label("Default Task Background ID")
+		temp = gtk.Label("Normal Task Background ID")
 		temp.set_alignment(0, 0.5)
 		self.tableTaskDefault.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.taskBg = gtk.combo_box_new_text()
@@ -729,7 +719,7 @@ class TintWizardGUI(gtk.Window):
 		temp.set_alignment(0, 0.5)
 		self.tableTaskDefault.attach(temp, 0, 3, 1, 2, xpadding=10)
 		
-		temp = gtk.Label("Default Icon Alpha (0 to 100)")
+		temp = gtk.Label("Normal Icon Alpha (0 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableTaskDefault.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.iconHue = gtk.Entry(6)
@@ -738,7 +728,7 @@ class TintWizardGUI(gtk.Window):
 		self.iconHue.connect("changed", self.changeOccurred)
 		self.tableTaskDefault.attach(self.iconHue, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 
-		temp = gtk.Label("Default Icon Saturation (-100 to 100)")
+		temp = gtk.Label("Normal Icon Saturation (-100 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableTaskDefault.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.iconSat = gtk.Entry(6)
@@ -747,7 +737,7 @@ class TintWizardGUI(gtk.Window):
 		self.iconSat.connect("changed", self.changeOccurred)
 		self.tableTaskDefault.attach(self.iconSat, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 
-		temp = gtk.Label("Default Icon Brightness (-100 to 100)")
+		temp = gtk.Label("Normal Icon Brightness (-100 to 100)")
 		temp.set_alignment(0, 0.5)
 		self.tableTaskDefault.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.iconBri = gtk.Entry(6)
@@ -756,7 +746,7 @@ class TintWizardGUI(gtk.Window):
 		self.iconBri.connect("changed", self.changeOccurred)
 		self.tableTaskDefault.attach(self.iconBri, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Default Font Color")
+		temp = gtk.Label("Normal Font Color")
 		temp.set_alignment(0, 0.5)
 		self.tableTaskDefault.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.fontCol = gtk.Entry(7)
@@ -857,7 +847,32 @@ class TintWizardGUI(gtk.Window):
 		temp.set_alignment(0, 0.5)
 		self.tableTaskUrgent.attach(temp, 0, 3, 1, 2, xpadding=10)
 		
-		
+		temp = gtk.Label("Urgent Icon Alpha (0 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskUrgent.attach(temp, 0, 1, 2, 3, xpadding=10)
+		self.urgentIconHue = gtk.Entry(6)
+		self.urgentIconHue.set_width_chars(8)
+		self.urgentIconHue.set_text(ICON_ALPHA)
+		self.urgentIconHue.connect("changed", self.changeOccurred)
+		self.tableTaskUrgent.attach(self.urgentIconHue, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+
+		temp = gtk.Label("Urgent Icon Saturation (-100 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskUrgent.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.urgentIconSat = gtk.Entry(6)
+		self.urgentIconSat.set_width_chars(8)
+		self.urgentIconSat.set_text(ICON_SAT)
+		self.urgentIconSat.connect("changed", self.changeOccurred)
+		self.tableTaskUrgent.attach(self.urgentIconSat, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+
+		temp = gtk.Label("Urgent Icon Brightness (-100 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskUrgent.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.urgentIconBri = gtk.Entry(6)
+		self.urgentIconBri.set_width_chars(8)
+		self.urgentIconBri.set_text(ICON_BRI)
+		self.urgentIconBri.connect("changed", self.changeOccurred)
+		self.tableTaskUrgent.attach(self.urgentIconBri, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Urgent Font Color")
 		temp.set_alignment(0, 0.5)
@@ -896,7 +911,32 @@ class TintWizardGUI(gtk.Window):
 		temp.set_alignment(0, 0.5)
 		self.tableTaskIconified.attach(temp, 0, 3, 1, 2, xpadding=10)
 		
-		
+		temp = gtk.Label("Iconified Icon Alpha (0 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskIconified.attach(temp, 0, 1, 2, 3, xpadding=10)
+		self.iconifiedIconHue = gtk.Entry(6)
+		self.iconifiedIconHue.set_width_chars(8)
+		self.iconifiedIconHue.set_text(ICON_ALPHA)
+		self.iconifiedIconHue.connect("changed", self.changeOccurred)
+		self.tableTaskIconified.attach(self.iconifiedIconHue, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+
+		temp = gtk.Label("Iconified Icon Saturation (-100 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskIconified.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.iconifiedIconSat = gtk.Entry(6)
+		self.iconifiedIconSat.set_width_chars(8)
+		self.iconifiedIconSat.set_text(ICON_SAT)
+		self.iconifiedIconSat.connect("changed", self.changeOccurred)
+		self.tableTaskIconified.attach(self.iconifiedIconSat, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+
+		temp = gtk.Label("Iconified Icon Brightness (-100 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTaskIconified.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.iconifiedIconBri = gtk.Entry(6)
+		self.iconifiedIconBri.set_width_chars(8)
+		self.iconifiedIconBri.set_text(ICON_BRI)
+		self.iconifiedIconBri.connect("changed", self.changeOccurred)
+		self.tableTaskIconified.attach(self.iconifiedIconBri, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
 		temp = gtk.Label("Iconified Font Color")
 		temp.set_alignment(0, 0.5)
@@ -1377,10 +1417,7 @@ class TintWizardGUI(gtk.Window):
 		self.taskNotebook.set_current_page(0)
 
 		self.taskNotebook.append_page(self.tableTask, gtk.Label("Task Settings"))
-		# TODO - remove after certain this is fine
-		#self.taskNotebook.append_page(self.tableIcon, gtk.Label("Task Icons"))
-		#self.taskNotebook.append_page(self.tableFont, gtk.Label("Task Fonts"))
-		self.taskNotebook.append_page(self.tableTaskDefault, gtk.Label("Default Tasks"))
+		self.taskNotebook.append_page(self.tableTaskDefault, gtk.Label("Normal Tasks"))
 		self.taskNotebook.append_page(self.tableTaskActive, gtk.Label("Active Tasks"))
 		self.taskNotebook.append_page(self.tableTaskUrgent, gtk.Label("Urgent Tasks"))
 		self.taskNotebook.append_page(self.tableTaskIconified, gtk.Label("Iconified Tasks"))
@@ -1467,6 +1504,8 @@ class TintWizardGUI(gtk.Window):
 			"task_iconified_font_color": (self.fontIconifiedCol, self.fontIconifiedColButton),
 			"task_icon_asb": (self.iconHue, self.iconSat, self.iconBri),
 			"task_active_icon_asb": (self.activeIconHue, self.activeIconSat, self.activeIconBri),
+			"task_urgent_icon_asb": (self.urgentIconHue, self.urgentIconSat, self.urgentIconBri),
+			"task_iconified_icon_asb": (self.iconifiedIconHue, self.iconifiedIconSat, self.iconifiedIconBri),
 			"font_shadow": self.fontShadowCheckButton,
 			"systray": self.trayShow,
 			"systray_padding": (self.trayPadX, self.trayPadY, self.traySpacing),
@@ -1506,10 +1545,6 @@ class TintWizardGUI(gtk.Window):
 			self.readTint2Config()
 
 		self.generateConfig()
-
-	# TODO - is this really needed?
-	def mouseoverCallback(self, widget=None):
-		print widget
 
 	def about(self, action=None):
 		"""Displays the About dialog."""
@@ -1842,13 +1877,21 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_background_id = %s\n" % (self.taskActiveBg.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_urgent_background_id = %s\n" % (self.taskUrgentBg.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_iconified_background_id = %s\n" % (self.taskIconifiedBg.get_active()))
+		
+		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Task Icons\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_icon_asb = %s %s %s\n" % (self.iconHue.get_text() if self.iconHue.get_text() else ICON_ALPHA,
 															self.iconSat.get_text() if self.iconSat.get_text() else ICON_SAT,
 															self.iconBri.get_text() if self.iconBri.get_text() else ICON_BRI))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_icon_asb = %s %s %s\n" % (self.activeIconHue.get_text() if self.activeIconHue.get_text() else ACTIVE_ICON_ALPHA,
 															self.activeIconSat.get_text() if self.activeIconSat.get_text() else ACTIVE_ICON_SAT,
 															self.activeIconBri.get_text() if self.activeIconBri.get_text() else ACTIVE_ICON_BRI))
-
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_urgent_icon_asb = %s %s %s\n" % (self.urgentIconHue.get_text() if self.urgentIconHue.get_text() else URGENT_ICON_ALPHA,
+															self.urgentIconSat.get_text() if self.urgentIconSat.get_text() else URGENT_ICON_SAT,
+															self.urgentIconBri.get_text() if self.urgentIconBri.get_text() else URGENT_ICON_BRI))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_iconified_icon_asb = %s %s %s\n" % (self.iconifiedIconHue.get_text() if self.iconifiedIconHue.get_text() else ICONIFIED_ICON_ALPHA,
+															self.iconifiedIconSat.get_text() if self.iconifiedIconSat.get_text() else ICONIFIED_ICON_SAT,
+															self.iconifiedIconBri.get_text() if self.iconifiedIconBri.get_text() else ICONIFIED_ICON_BRI))
+															
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Fonts\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_font = %s\n" % (self.fontButton.get_font_name()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_font_color = %s %s\n" % (self.getHexFromWidget(self.fontColButton),
@@ -2071,6 +2114,12 @@ class TintWizardGUI(gtk.Window):
 		self.activeIconHue.set_text(ACTIVE_ICON_ALPHA)
 		self.activeIconSat.set_text(ACTIVE_ICON_SAT)
 		self.activeIconBri.set_text(ACTIVE_ICON_BRI)
+		self.urgentIconHue.set_text(URGENT_ICON_ALPHA)
+		self.urgentIconSat.set_text(URGENT_ICON_SAT)
+		self.urgentIconBri.set_text(URGENT_ICON_BRI)
+		self.iconifiedIconHue.set_text(ICONIFIED_ICON_ALPHA)
+		self.iconifiedIconSat.set_text(ICONIFIED_ICON_SAT)
+		self.iconifiedIconBri.set_text(ICONIFIED_ICON_BRI)
 		# Fonts
 		self.fontButton.set_font_name(self.defaults["font"])
 		self.fontColButton.set_alpha(65535)
