@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #*************************************************************************/
-# Last modified: 5th March 2010
+# Last modified: 6th March 2010
 
 import pygtk
 pygtk.require('2.0')
@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r169"
+VERSION = "SVN r170"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -49,6 +49,7 @@ PANEL_MONITOR = "all"
 PANEL_AUTOHIDE_SHOW = "0.0"
 PANEL_AUTOHIDE_HIDE = "0.0"
 PANEL_AUTOHIDE_HEIGHT = "0"
+PANEL_AUTOHIDE_STRUT = "minimum"
 TASKBAR_PADDING_X = "0"
 TASKBAR_PADDING_Y = "0"
 TASKBAR_SPACING = "0"
@@ -530,6 +531,15 @@ class TintWizardGUI(gtk.Window):
 		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
 		self.panelAutohideHeight.connect("changed", self.changeOccurred)
 		self.tablePanelSettings.attach(self.panelAutohideHeight, 1, 2, 6, 7, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Strut Policy")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
+		self.panelAutohideStrut = gtk.Entry(6)
+		self.panelAutohideStrut.set_width_chars(8)
+		self.panelAutohideStrut.set_text(PANEL_AUTOHIDE_STRUT)
+		self.panelAutohideStrut.connect("changed", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 7, 8, xoptions=gtk.EXPAND)
 		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=5, columns=3, homogeneous=False)
@@ -1332,6 +1342,7 @@ class TintWizardGUI(gtk.Window):
 			"autohide_show_timeout": self.panelAutohideShow,
 			"autohide_hide_timeout": self.panelAutohideHide,
 			"autohide_height": self.panelAutohideHeight,
+			"strut_policy": self.panelAutohideStrut,
 			"taskbar_mode": self.taskbarMode,
 			"taskbar_padding": (self.taskbarPadX, self.taskbarPadY, self.taskbarSpacing),
 			"taskbar_background_id": self.taskbarBg,
@@ -1698,6 +1709,7 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_show_timeout = %s\n" % (self.panelAutohideShow.get_text() if self.panelAutohideShow.get_text() else PANEL_AUTOHIDE_SHOW))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_hide_timeout = %s\n" % (self.panelAutohideHide.get_text() if self.panelAutohideHide.get_text() else PANEL_AUTOHIDE_HIDE))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_height = %s\n" % (self.panelAutohideHeight.get_text() if self.panelAutohideHeight.get_text() else PANEL_AUTOHIDE_HEIGHT))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "strut_policy = %s\n" % (self.panelAutohideStrut.get_text() if self.panelAutohideStrut.get_text() else PANEL_AUTOHIDE_STRUT))
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Taskbar\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "taskbar_mode = %s\n" % (self.taskbarMode.get_active_text()))
@@ -1908,6 +1920,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
 		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
 		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
+		self.panelAutohideStrut.set_text(PANEL_AUTOHIDE_STRUT)
 		# Taskbar
 		self.taskbarMode.set_active(0)
 		self.taskbarPadX.set_text(TASKBAR_PADDING_X)
