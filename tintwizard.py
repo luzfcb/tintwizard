@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r171"
+VERSION = "SVN r172"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -1109,6 +1109,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseMiddle.append_text("maximize_restore")
 		self.mouseMiddle.append_text("desktop_left")
 		self.mouseMiddle.append_text("desktop_right")
+		self.mouseMiddle.append_text("next_task")
+		self.mouseMiddle.append_text("prev_task")
 		self.mouseMiddle.set_active(0)
 		self.mouseMiddle.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseMiddle, 1, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -1126,6 +1128,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseRight.append_text("maximize_restore")
 		self.mouseRight.append_text("desktop_left")
 		self.mouseRight.append_text("desktop_right")
+		self.mouseRight.append_text("next_task")
+		self.mouseRight.append_text("prev_task")
 		self.mouseRight.set_active(0)
 		self.mouseRight.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseRight, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -1143,6 +1147,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseUp.append_text("maximize_restore")
 		self.mouseUp.append_text("desktop_left")
 		self.mouseUp.append_text("desktop_right")
+		self.mouseUp.append_text("next_task")
+		self.mouseUp.append_text("prev_task")
 		self.mouseUp.set_active(0)
 		self.mouseUp.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseUp, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -1160,6 +1166,8 @@ class TintWizardGUI(gtk.Window):
 		self.mouseDown.append_text("maximize_restore")
 		self.mouseDown.append_text("desktop_left")
 		self.mouseDown.append_text("desktop_right")
+		self.mouseDown.append_text("next_task")
+		self.mouseDown.append_text("prev_task")
 		self.mouseDown.set_active(0)
 		self.mouseDown.connect("changed", self.changeOccurred)
 		self.tableMouse.attach(self.mouseDown, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
@@ -2167,7 +2175,7 @@ class TintWizardGUI(gtk.Window):
 			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
 							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
 							"desktop_left", "desktop_right", "horizontal", "vertical", "ascending", "descending",
-							"left2right", "right2left"]:
+							"left2right", "right2left", "next_task", "prev_task"]:
 				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "ascending"]:
 					i = 0
 				elif string in ["top", "right", "multi_desktop", "close", "vertical", "descending"]:
@@ -2178,7 +2186,7 @@ class TintWizardGUI(gtk.Window):
 					i = 3
 				else:
 					i = ["none", "close", "toggle", "iconify", "shade", "toggle_iconify", "maximize_restore",
-						"desktop_left", "desktop_right"].index(string)
+						"desktop_left", "desktop_right", "next_task", "prev_task"].index(string)
 
 				prop.set_active(i)
 			else:
