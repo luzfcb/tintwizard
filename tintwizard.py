@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r177"
+VERSION = "SVN r178"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -49,7 +49,6 @@ PANEL_MONITOR = "all"
 PANEL_AUTOHIDE_SHOW = "0.0"
 PANEL_AUTOHIDE_HIDE = "0.0"
 PANEL_AUTOHIDE_HEIGHT = "0"
-PANEL_AUTOHIDE_STRUT = "minimum"
 TASKBAR_PADDING_X = "0"
 TASKBAR_PADDING_Y = "0"
 TASKBAR_SPACING = "0"
@@ -536,11 +535,13 @@ class TintWizardGUI(gtk.Window):
 		temp = gtk.Label("Autohide Strut Policy")
 		temp.set_alignment(0, 0.5)
 		self.tablePanelSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
-		self.panelAutohideStrut = gtk.Entry(12)
-		self.panelAutohideStrut.set_width_chars(20)
-		self.panelAutohideStrut.set_text(PANEL_AUTOHIDE_STRUT)
+		self.panelAutohideStrut = gtk.combo_box_new_text()
+		self.panelAutohideStrut.append_text("none")
+		self.panelAutohideStrut.append_text("minimum")
+		self.panelAutohideStrut.append_text("follow_size")
+		self.panelAutohideStrut.set_active(0)
 		self.panelAutohideStrut.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 7, 8, xoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=5, columns=3, homogeneous=False)
@@ -1910,7 +1911,7 @@ class TintWizardGUI(gtk.Window):
 		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_show_timeout = %s\n" % (self.panelAutohideShow.get_text() if self.panelAutohideShow.get_text() else PANEL_AUTOHIDE_SHOW))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_hide_timeout = %s\n" % (self.panelAutohideHide.get_text() if self.panelAutohideHide.get_text() else PANEL_AUTOHIDE_HIDE))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "autohide_height = %s\n" % (self.panelAutohideHeight.get_text() if self.panelAutohideHeight.get_text() else PANEL_AUTOHIDE_HEIGHT))
-		self.configBuf.insert(self.configBuf.get_end_iter(), "strut_policy = %s\n" % (self.panelAutohideStrut.get_text() if self.panelAutohideStrut.get_text() else PANEL_AUTOHIDE_STRUT))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "strut_policy = %s\n" % (self.panelAutohideStrut.get_active_text() if self.panelAutohideStrut.get_active_text() else PANEL_AUTOHIDE_STRUT))
 		
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Taskbar\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "taskbar_mode = %s\n" % (self.taskbarMode.get_active_text()))
@@ -2150,7 +2151,7 @@ class TintWizardGUI(gtk.Window):
 		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
 		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
 		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
-		self.panelAutohideStrut.set_text(PANEL_AUTOHIDE_STRUT)
+		self.panelAutohideStrut.set_active(0)
 		# Taskbar
 		self.taskbarMode.set_active(0)
 		self.taskbarPadX.set_text(TASKBAR_PADDING_X)
@@ -2436,12 +2437,12 @@ class TintWizardGUI(gtk.Window):
 			if string in ["bottom", "top", "left", "right", "center", "single_desktop", "multi_desktop", "single_monitor",
 							"none", "close", "shade", "iconify", "toggle", "toggle_iconify", "maximize_restore",
 							"desktop_left", "desktop_right", "horizontal", "vertical", "ascending", "descending",
-							"left2right", "right2left", "next_task", "prev_task"]:
+							"left2right", "right2left", "next_task", "prev_task", "minimum", "follow_size"]:
 				if string in ["bottom", "left", "single_desktop", "none", "horizontal", "ascending"]:
 					i = 0
-				elif string in ["top", "right", "multi_desktop", "close", "vertical", "descending"]:
+				elif string in ["top", "right", "multi_desktop", "close", "vertical", "descending", "minimum"]:
 					i = 1
-				elif string in ["center", "single_monitor", "toggle", "left2right"]:
+				elif string in ["center", "single_monitor", "toggle", "left2right", "follow_size"]:
 					i = 2
 				elif string in ["right2left"]:
 					i = 3
