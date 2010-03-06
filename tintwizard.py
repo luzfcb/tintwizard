@@ -35,14 +35,13 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r180"
+VERSION = "SVN r181"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
 # Default values for text entry fields
 BG_ROUNDING = "0"
 BG_BORDER = "0"
-REAL_TRANSPARENCY = "0"
 PANEL_SIZE_X = "0"
 PANEL_SIZE_Y = "40"
 PANEL_MARGIN_X = "0"
@@ -472,7 +471,7 @@ class TintWizardGUI(gtk.Window):
 		self.tablePanelDisplay.attach(self.panelBg, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
 		# Panel Settings
-		self.tablePanelSettings = gtk.Table(rows=7, columns=3, homogeneous=False)
+		self.tablePanelSettings = gtk.Table(rows=5, columns=3, homogeneous=False)
 		self.tablePanelSettings.set_row_spacings(5)
 		self.tablePanelSettings.set_col_spacings(5)
 		
@@ -503,61 +502,67 @@ class TintWizardGUI(gtk.Window):
 		self.panelLayer.connect("changed", self.changeOccurred)
 		self.tablePanelSettings.attach(self.panelLayer, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 		
-		
-		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
+		temp = gtk.Label("Strut Policy")
 		temp.set_alignment(0, 0.5)
 		self.tablePanelSettings.attach(temp, 0, 1, 3, 4, xpadding=10)
-		self.panelMonitor = gtk.Entry(6)
-		self.panelMonitor.set_width_chars(8)
-		self.panelMonitor.set_text(PANEL_MONITOR)
-		self.panelMonitor.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelMonitor, 1, 2, 3, 4, xoptions=gtk.EXPAND)
-		
-		temp = gtk.Label("Autohide Panel")
-		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 4, 5, xpadding=10)
-		self.panelAutohide = gtk.CheckButton()
-		self.panelAutohide.set_active(False)
-		self.panelAutohide.connect("toggled", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohide, 1, 2, 4, 5, xoptions=gtk.EXPAND)
-		
-		temp = gtk.Label("Autohide Show Timeout (seconds)")
-		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 5, 6, xpadding=10)
-		self.panelAutohideShow = gtk.Entry(6)
-		self.panelAutohideShow.set_width_chars(8)
-		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
-		self.panelAutohideShow.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideShow, 1, 2, 5, 6, xoptions=gtk.EXPAND)
-		
-		temp = gtk.Label("Autohide Hide Timeout (seconds)")
-		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 6, 7, xpadding=10)
-		self.panelAutohideHide = gtk.Entry(6)
-		self.panelAutohideHide.set_width_chars(8)
-		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
-		self.panelAutohideHide.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideHide, 1, 2, 6, 7, xoptions=gtk.EXPAND)
-		
-		temp = gtk.Label("Autohide Hidden Height")
-		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
-		self.panelAutohideHeight = gtk.Entry(6)
-		self.panelAutohideHeight.set_width_chars(8)
-		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
-		self.panelAutohideHeight.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideHeight, 1, 2, 7, 8, xoptions=gtk.EXPAND)
-		
-		temp = gtk.Label("Autohide Strut Policy")
-		temp.set_alignment(0, 0.5)
-		self.tablePanelSettings.attach(temp, 0, 1, 8, 9, xpadding=10)
 		self.panelAutohideStrut = gtk.combo_box_new_text()
 		self.panelAutohideStrut.append_text("none")
 		self.panelAutohideStrut.append_text("minimum")
 		self.panelAutohideStrut.append_text("follow_size")
 		self.panelAutohideStrut.set_active(0)
 		self.panelAutohideStrut.connect("changed", self.changeOccurred)
-		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 8, 9, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Panel Monitor (all, 1, 2...)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelSettings.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.panelMonitor = gtk.Entry(6)
+		self.panelMonitor.set_width_chars(8)
+		self.panelMonitor.set_text(PANEL_MONITOR)
+		self.panelMonitor.connect("changed", self.changeOccurred)
+		self.tablePanelSettings.attach(self.panelMonitor, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		
+		# Panel Autohide
+		self.tablePanelAutohide = gtk.Table(rows=4, columns=3, homogeneous=False)
+		self.tablePanelAutohide.set_row_spacings(5)
+		self.tablePanelAutohide.set_col_spacings(5)
+		
+		temp = gtk.Label("Autohide Panel")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelAutohide.attach(temp, 0, 1, 0, 1, xpadding=10)
+		self.panelAutohide = gtk.CheckButton()
+		self.panelAutohide.set_active(False)
+		self.panelAutohide.connect("toggled", self.changeOccurred)
+		self.tablePanelAutohide.attach(self.panelAutohide, 1, 2, 0, 1, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Show Timeout (seconds)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelAutohide.attach(temp, 0, 1, 1, 2, xpadding=10)
+		self.panelAutohideShow = gtk.Entry(6)
+		self.panelAutohideShow.set_width_chars(8)
+		self.panelAutohideShow.set_text(PANEL_AUTOHIDE_SHOW)
+		self.panelAutohideShow.connect("changed", self.changeOccurred)
+		self.tablePanelAutohide.attach(self.panelAutohideShow, 1, 2, 1, 2, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Hide Timeout (seconds)")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelAutohide.attach(temp, 0, 1, 2, 3, xpadding=10)
+		self.panelAutohideHide = gtk.Entry(6)
+		self.panelAutohideHide.set_width_chars(8)
+		self.panelAutohideHide.set_text(PANEL_AUTOHIDE_HIDE)
+		self.panelAutohideHide.connect("changed", self.changeOccurred)
+		self.tablePanelAutohide.attach(self.panelAutohideHide, 1, 2, 2, 3, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Autohide Hidden Height")
+		temp.set_alignment(0, 0.5)
+		self.tablePanelAutohide.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.panelAutohideHeight = gtk.Entry(6)
+		self.panelAutohideHeight.set_width_chars(8)
+		self.panelAutohideHeight.set_text(PANEL_AUTOHIDE_HEIGHT)
+		self.panelAutohideHeight.connect("changed", self.changeOccurred)
+		self.tablePanelAutohide.attach(self.panelAutohideHeight, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		
+		
 		
 		# Taskbar
 		self.tableTaskbar = gtk.Table(rows=5, columns=3, homogeneous=False)
@@ -1482,6 +1487,7 @@ class TintWizardGUI(gtk.Window):
 		
 		self.panelNotebook.append_page(self.tablePanelDisplay, gtk.Label("Panel Display"))
 		self.panelNotebook.append_page(self.tablePanelSettings, gtk.Label("Panel Settings"))
+		self.panelNotebook.append_page(self.tablePanelAutohide, gtk.Label("Panel Autohide"))
 		
 		self.taskNotebook = gtk.Notebook()
 		self.taskNotebook.set_tab_pos(gtk.POS_TOP)
