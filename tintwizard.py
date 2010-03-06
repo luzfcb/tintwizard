@@ -35,7 +35,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r173"
+VERSION = "SVN r174"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -797,7 +797,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableIcon.attach(self.activeIconBri, 1, 2, 7, 8, xoptions=gtk.EXPAND)
 
 		# Font Options
-		self.tableFont = gtk.Table(rows=3, columns=3, homogeneous=False)
+		self.tableFont = gtk.Table(rows=6, columns=3, homogeneous=False)
 		self.tableFont.set_row_spacings(5)
 		self.tableFont.set_col_spacings(5)
 
@@ -846,14 +846,48 @@ class TintWizardGUI(gtk.Window):
 		self.fontActiveCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.fontActiveCol.connect("changed", self.changeOccurred)
+		
+		temp = gtk.Label("Urgent Font Color")
+		temp.set_alignment(0, 0.5)
+		self.tableFont.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.fontUrgentCol = gtk.Entry(7)
+		self.fontUrgentCol.set_width_chars(9)
+		self.fontUrgentCol.set_name("fontUrgentCol")
+		self.fontUrgentCol.connect("activate", self.colorTyped)
+		self.tableFont.attach(self.fontUrgentCol, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		self.fontUrgentColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
+		self.fontUrgentColButton.set_use_alpha(True)
+		self.fontUrgentColButton.set_name("fontUrgentCol")
+		self.fontUrgentColButton.connect("color-set", self.colorChange)
+		self.tableFont.attach(self.fontUrgentColButton, 2, 3, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.fontUrgentCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.fontUrgentCol.connect("changed", self.changeOccurred)
+		
+		temp = gtk.Label("Iconified Font Color")
+		temp.set_alignment(0, 0.5)
+		self.tableFont.attach(temp, 0, 1, 4, 5, xpadding=10)
+		self.fontIconifiedCol = gtk.Entry(7)
+		self.fontIconifiedCol.set_width_chars(9)
+		self.fontIconifiedCol.set_name("fontIconifiedCol")
+		self.fontIconifiedCol.connect("activate", self.colorTyped)
+		self.tableFont.attach(self.fontIconifiedCol, 1, 2, 4, 5, xoptions=gtk.EXPAND)
+		self.fontIconifiedColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
+		self.fontIconifiedColButton.set_use_alpha(True)
+		self.fontIconifiedColButton.set_name("fontIconifiedCol")
+		self.fontIconifiedColButton.connect("color-set", self.colorChange)
+		self.tableFont.attach(self.fontIconifiedColButton, 2, 3, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.fontIconifiedCol.set_text(self.defaults["fgColor"])
+		# Add this AFTER we set color to avoid "changed" event
+		self.fontIconifiedCol.connect("changed", self.changeOccurred)
 
 		temp = gtk.Label("Font Shadow")
 		temp.set_alignment(0, 0.5)
-		self.tableFont.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.tableFont.attach(temp, 0, 1, 5, 6, xpadding=10)
 		self.fontShadowCheckButton = gtk.CheckButton()
 		self.fontShadowCheckButton.set_active(False)
 		self.fontShadowCheckButton.connect("toggled", self.changeOccurred)
-		self.tableFont.attach(self.fontShadowCheckButton, 1, 2, 3, 4, xoptions=gtk.EXPAND)
+		self.tableFont.attach(self.fontShadowCheckButton, 1, 2, 5, 6, xoptions=gtk.EXPAND)
 
 		# Systray Options
 		self.tableTray = gtk.Table(rows=3, columns=3, homogeneous=False)
@@ -1398,6 +1432,8 @@ class TintWizardGUI(gtk.Window):
 			"task_font": self.fontButton,
 			"task_font_color": (self.fontCol, self.fontColButton),
 			"task_active_font_color": (self.fontActiveCol, self.fontActiveColButton),
+			"task_urgent_font_color": (self.fontUrgentCol, self.fontUrgentColButton),
+			"task_iconified_font_color": (self.fontIconifiedCol, self.fontIconifiedColButton),
 			"task_icon_asb": (self.iconHue, self.iconSat, self.iconBri),
 			"task_active_icon_asb": (self.activeIconHue, self.activeIconSat, self.activeIconBri),
 			"font_shadow": self.fontShadowCheckButton,
@@ -1788,6 +1824,10 @@ class TintWizardGUI(gtk.Window):
 															int(self.fontColButton.get_alpha() / 65535.0 * 100)))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_font_color = %s %s\n" % (self.getHexFromWidget(self.fontActiveColButton),
 															int(self.fontActiveColButton.get_alpha() / 65535.0 * 100)))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_urgent_font_color = %s %s\n" % (self.getHexFromWidget(self.fontUrgentColButton),
+															int(self.fontUrgentColButton.get_alpha() / 65535.0 * 100)))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_iconified_font_color = %s %s\n" % (self.getHexFromWidget(self.fontIconifiedColButton),
+															int(self.fontIconifiedColButton.get_alpha() / 65535.0 * 100)))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "font_shadow = %s\n" % int(self.fontShadowCheckButton.get_active()))
 
 		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Systray\n")
@@ -1853,6 +1893,10 @@ class TintWizardGUI(gtk.Window):
 			return self.fontColButton
 		elif widget.get_name() == "fontActiveCol":
 			return self.fontActiveColButton
+		elif widget.get_name() == "fontUrgentCol":
+			return self.fontUrgentColButton
+		elif widget.get_name() == "fontIconifiedCol":
+			return self.fontIconifiedColButton
 		elif widget.get_name() == "clockFontCol":
 			return self.clockFontColButton
 		elif widget.get_name() == "batteryFontCol":
@@ -1883,6 +1927,10 @@ class TintWizardGUI(gtk.Window):
 			return self.fontCol
 		elif widget.get_name() == "fontActiveCol":
 			return self.fontActiveCol
+		elif widget.get_name() == "fontUrgentCol":
+			return self.fontUrgentCol
+		elif widget.get_name() == "fontIconifiedCol":
+			return self.fontIconifiedCol
 		elif widget.get_name() == "clockFontCol":
 			return self.clockFontCol
 		elif widget.get_name() == "batteryFontCol":
@@ -2000,6 +2048,12 @@ class TintWizardGUI(gtk.Window):
 		self.fontActiveColButton.set_alpha(65535)
 		self.fontActiveColButton.set_color(gtk.gdk.color_parse(self.defaults["fgColor"]))
 		self.fontActiveCol.set_text(self.defaults["fgColor"])
+		self.fontUrgentColButton.set_alpha(65535)
+		self.fontUrgentColButton.set_color(gtk.gdk.color_parse(self.defaults["fgColor"]))
+		self.fontUrgentCol.set_text(self.defaults["fgColor"])
+		self.fontIconifiedColButton.set_alpha(65535)
+		self.fontIconifiedColButton.set_color(gtk.gdk.color_parse(self.defaults["fgColor"]))
+		self.fontIconifiedCol.set_text(self.defaults["fgColor"])
 		self.fontShadowCheckButton.set_active(False)
 		# Systray
 		self.trayShow.set_active(True)
