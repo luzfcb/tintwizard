@@ -19,9 +19,6 @@
 #*************************************************************************/
 # Last modified: 6th March 2010
 
-# TODO panel layer
-# TODO system icon size and ASB
-
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -35,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r181"
+VERSION = "SVN r182"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -64,6 +61,10 @@ TASK_SPACING = "0"
 TRAY_PADDING_X = "0"
 TRAY_PADDING_Y = "0"
 TRAY_SPACING = "0"
+TRAY_MAX_ICON_SIZE = "0"
+TRAY_ICON_ALPHA = "100"
+TRAY_ICON_SAT = "0"
+TRAY_ICON_BRI = "0"
 ICON_ALPHA = "100"
 ICON_SAT = "0"
 ICON_BRI = "0"
@@ -876,7 +877,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskUrgent.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.urgentIconHue = gtk.Entry(6)
 		self.urgentIconHue.set_width_chars(8)
-		self.urgentIconHue.set_text(ICON_ALPHA)
+		self.urgentIconHue.set_text(URGENT_ICON_ALPHA)
 		self.urgentIconHue.connect("changed", self.changeOccurred)
 		self.tableTaskUrgent.attach(self.urgentIconHue, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 
@@ -885,7 +886,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskUrgent.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.urgentIconSat = gtk.Entry(6)
 		self.urgentIconSat.set_width_chars(8)
-		self.urgentIconSat.set_text(ICON_SAT)
+		self.urgentIconSat.set_text(URGENT_ICON_SAT)
 		self.urgentIconSat.connect("changed", self.changeOccurred)
 		self.tableTaskUrgent.attach(self.urgentIconSat, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 
@@ -894,7 +895,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskUrgent.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.urgentIconBri = gtk.Entry(6)
 		self.urgentIconBri.set_width_chars(8)
-		self.urgentIconBri.set_text(ICON_BRI)
+		self.urgentIconBri.set_text(URGENT_ICON_BRI)
 		self.urgentIconBri.connect("changed", self.changeOccurred)
 		self.tableTaskUrgent.attach(self.urgentIconBri, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
@@ -940,7 +941,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskIconified.attach(temp, 0, 1, 2, 3, xpadding=10)
 		self.iconifiedIconHue = gtk.Entry(6)
 		self.iconifiedIconHue.set_width_chars(8)
-		self.iconifiedIconHue.set_text(ICON_ALPHA)
+		self.iconifiedIconHue.set_text(ICONIFIED_ICON_ALPHA)
 		self.iconifiedIconHue.connect("changed", self.changeOccurred)
 		self.tableTaskIconified.attach(self.iconifiedIconHue, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 
@@ -949,7 +950,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskIconified.attach(temp, 0, 1, 3, 4, xpadding=10)
 		self.iconifiedIconSat = gtk.Entry(6)
 		self.iconifiedIconSat.set_width_chars(8)
-		self.iconifiedIconSat.set_text(ICON_SAT)
+		self.iconifiedIconSat.set_text(ICONIFIED_ICON_SAT)
 		self.iconifiedIconSat.connect("changed", self.changeOccurred)
 		self.tableTaskIconified.attach(self.iconifiedIconSat, 1, 2, 3, 4, xoptions=gtk.EXPAND)
 
@@ -958,7 +959,7 @@ class TintWizardGUI(gtk.Window):
 		self.tableTaskIconified.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.iconifiedIconBri = gtk.Entry(6)
 		self.iconifiedIconBri.set_width_chars(8)
-		self.iconifiedIconBri.set_text(ICON_BRI)
+		self.iconifiedIconBri.set_text(ICONIFIED_ICON_BRI)
 		self.iconifiedIconBri.connect("changed", self.changeOccurred)
 		self.tableTaskIconified.attach(self.iconifiedIconBri, 1, 2, 4, 5, xoptions=gtk.EXPAND)
 		
@@ -979,12 +980,12 @@ class TintWizardGUI(gtk.Window):
 		# Add this AFTER we set color to avoid "changed" event
 		self.fontIconifiedCol.connect("changed", self.changeOccurred)
 
-		# Systray Options
-		self.tableTray = gtk.Table(rows=3, columns=3, homogeneous=False)
+		# System Tray Options
+		self.tableTray = gtk.Table(rows=9, columns=3, homogeneous=False)
 		self.tableTray.set_row_spacings(5)
 		self.tableTray.set_col_spacings(5)
 
-		temp = gtk.Label("Show Systray")
+		temp = gtk.Label("Show System Tray")
 		temp.set_alignment(0, 0.5)
 		self.tableTray.attach(temp, 0, 1, 0, 1, xpadding=10)
 		self.trayShow = gtk.CheckButton()
@@ -1015,9 +1016,20 @@ class TintWizardGUI(gtk.Window):
 		self.traySpacing.connect("changed", self.changeOccurred)
 		self.tableTray.attach(self.traySpacing, 1, 2, 2, 3, xoptions=gtk.EXPAND)
 
-		temp = gtk.Label("Icon Ordering")
+		temp = gtk.Label("System Tray Background ID")
 		temp.set_alignment(0, 0.5)
 		self.tableTray.attach(temp, 0, 1, 3, 4, xpadding=10)
+		self.trayBg = gtk.combo_box_new_text()
+		self.trayBg.append_text("0 (fully transparent)")
+		for i in range(len(self.bgs)):
+			self.trayBg.append_text(str(i+1))
+		self.trayBg.set_active(0)
+		self.trayBg.connect("changed", self.changeOccurred)
+		self.tableTray.attach(self.trayBg, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Icon Ordering")
+		temp.set_alignment(0, 0.5)
+		self.tableTray.attach(temp, 0, 1, 4, 5, xpadding=10)
 		self.trayOrder = gtk.combo_box_new_text()
 		self.trayOrder.append_text("ascending")
 		self.trayOrder.append_text("descending")
@@ -1025,19 +1037,44 @@ class TintWizardGUI(gtk.Window):
 		self.trayOrder.append_text("right2left")
 		self.trayOrder.set_active(0)
 		self.trayOrder.connect("changed", self.changeOccurred)
-		self.tableTray.attach(self.trayOrder, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Systray Background ID")
+		self.tableTray.attach(self.trayOrder, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Maximum Icon Size (0 for automatic size)")
 		temp.set_alignment(0, 0.5)
-		self.tableTray.attach(temp, 0, 1, 4, 5, xpadding=10)
-		self.trayBg = gtk.combo_box_new_text()
-		self.trayBg.append_text("0 (fully transparent)")
-		for i in range(len(self.bgs)):
-			self.trayBg.append_text(str(i+1))
-		self.trayBg.set_active(0)
-		self.trayBg.connect("changed", self.changeOccurred)
-		self.tableTray.attach(self.trayBg, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tableTray.attach(temp, 0, 1, 5, 6, xpadding=10)
+		self.trayMaxIconSize = gtk.Entry(6)
+		self.trayMaxIconSize.set_width_chars(8)
+		self.trayMaxIconSize.set_text(TRAY_MAX_ICON_SIZE)
+		self.trayMaxIconSize.connect("changed", self.changeOccurred)
+		self.tableTray.attach(self.trayMaxIconSize, 1, 2, 5, 6, xoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("System Tray Icon Alpha (0 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTray.attach(temp, 0, 1, 6, 7, xpadding=10)
+		self.trayIconHue = gtk.Entry(6)
+		self.trayIconHue.set_width_chars(8)
+		self.trayIconHue.set_text(TRAY_ICON_ALPHA)
+		self.trayIconHue.connect("changed", self.changeOccurred)
+		self.tableTray.attach(self.trayIconHue, 1, 2, 6, 7, xoptions=gtk.EXPAND)
 
+		temp = gtk.Label("System Tray Icon Saturation (-100 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTray.attach(temp, 0, 1, 7, 8, xpadding=10)
+		self.trayIconSat = gtk.Entry(6)
+		self.trayIconSat.set_width_chars(8)
+		self.trayIconSat.set_text(TRAY_ICON_SAT)
+		self.trayIconSat.connect("changed", self.changeOccurred)
+		self.tableTray.attach(self.trayIconSat, 1, 2, 7, 8, xoptions=gtk.EXPAND)
+
+		temp = gtk.Label("System Tray Icon Brightness (-100 to 100)")
+		temp.set_alignment(0, 0.5)
+		self.tableTray.attach(temp, 0, 1, 8, 9, xpadding=10)
+		self.trayIconBri = gtk.Entry(6)
+		self.trayIconBri.set_width_chars(8)
+		self.trayIconBri.set_text(TRAY_ICON_BRI)
+		self.trayIconBri.connect("changed", self.changeOccurred)
+		self.tableTray.attach(self.trayIconBri, 1, 2, 8, 9, xoptions=gtk.EXPAND)
+		
 		# Clock Options
 		self.tableClockDisplays = gtk.Table(rows=3, columns=3, homogeneous=False)
 		self.tableClockDisplays.set_row_spacings(5)
@@ -1511,7 +1548,7 @@ class TintWizardGUI(gtk.Window):
 		self.notebook.append_page(self.panelNotebook, gtk.Label("Panel"))
 		self.notebook.append_page(self.tableTaskbar, gtk.Label("Taskbar"))
 		self.notebook.append_page(self.taskNotebook, gtk.Label("Tasks"))
-		self.notebook.append_page(self.tableTray, gtk.Label("Systray"))
+		self.notebook.append_page(self.tableTray, gtk.Label("System Tray"))
 		self.notebook.append_page(self.clockNotebook, gtk.Label("Clock"))
 		self.notebook.append_page(self.tableMouse, gtk.Label("Mouse"))
 		self.notebook.append_page(self.tableTooltip, gtk.Label("Tooltips"))
@@ -1589,6 +1626,8 @@ class TintWizardGUI(gtk.Window):
 			"systray_padding": (self.trayPadX, self.trayPadY, self.traySpacing),
 			"systray_background_id": self.trayBg,
 			"systray_sort": self.trayOrder,
+			"systray_icon_size": self.trayMaxIconSize,
+			"systray_icon_asb": (self.trayIconHue, self.trayIconSat, self.trayIconBri),
 			"time1_format": self.clock1Format,
 			"time2_format": self.clock2Format,
 			"clock_tooltip": self.clockTooltipFormat,
@@ -2028,14 +2067,18 @@ class TintWizardGUI(gtk.Window):
 															int(self.fontIconifiedColButton.get_alpha() / 65535.0 * 100)))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "font_shadow = %s\n" % int(self.fontShadowCheckButton.get_active()))
 
-		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Systray\n")
+		self.configBuf.insert(self.configBuf.get_end_iter(), "\n# System Tray\n")
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray = %s\n" % int(self.trayShow.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_padding = %s %s %s\n" % (self.trayPadX.get_text() if self.trayPadX.get_text() else TRAY_PADDING_X,
 															self.trayPadY.get_text() if self.trayPadY.get_text() else TRAY_PADDING_Y,
 															self.traySpacing.get_text() if self.traySpacing.get_text() else TRAY_SPACING))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_sort = %s\n" % (self.trayOrder.get_active_text()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_background_id = %s\n" % (self.trayBg.get_active()))
-
+		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_icon_size = %s\n" % (self.trayMaxIconSize.get_text() if self.trayMaxIconSize.get_text() else TRAY_MAX_ICON_SIZE))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "systray_icon_asb = %s %s %s\n" % (self.trayIconHue.get_text() if self.trayIconHue.get_text() else TRAY_ICON_ALPHA,
+															self.trayIconSat.get_text() if self.trayIconSat.get_text() else TRAY_ICON_SAT,
+															self.trayIconBri.get_text() if self.trayIconBri.get_text() else TRAY_ICON_BRI))
+		
 		if self.clockCheckButton.get_active():
 			self.configBuf.insert(self.configBuf.get_end_iter(), "\n# Clock\n")
 			if self.clock1CheckButton.get_active():
@@ -2522,13 +2565,17 @@ class TintWizardGUI(gtk.Window):
 		self.fontIconifiedColButton.set_color(gtk.gdk.color_parse(self.defaults["fgColor"]))
 		self.fontIconifiedCol.set_text(self.defaults["fgColor"])
 		self.fontShadowCheckButton.set_active(False)
-		# Systray
+		# System Tray
 		self.trayShow.set_active(True)
 		self.trayPadX.set_text(TRAY_PADDING_X)
 		self.trayPadY.set_text(TRAY_PADDING_X)
 		self.traySpacing.set_text(TRAY_SPACING)
 		self.trayOrder.set_active(0)
 		self.trayBg.set_active(0)
+		self.trayMaxIconSize.set_text(TRAY_MAX_ICON_SIZE)
+		self.trayIconHue.set_text(TRAY_ICON_ALPHA)
+		self.trayIconSat.set_text(TRAY_ICON_SAT)
+		self.trayIconBri.set_text(TRAY_ICON_BRI)
 		# Clock
 		self.clockCheckButton.set_active(True)
 		self.clock1Format.set_text(CLOCK_FMT_1)
