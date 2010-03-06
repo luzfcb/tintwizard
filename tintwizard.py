@@ -19,6 +19,9 @@
 #*************************************************************************/
 # Last modified: 6th March 2010
 
+# TODO - rearrange task settings?
+# TODO - timezone support
+
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -32,7 +35,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r172"
+VERSION = "SVN r173"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -68,6 +71,12 @@ ICON_BRI = "0"
 ACTIVE_ICON_ALPHA = "100"
 ACTIVE_ICON_SAT = "0"
 ACTIVE_ICON_BRI = "0"
+URGENT_ICON_ALPHA = "100"
+URGENT_ICON_SAT = "0"
+URGENT_ICON_BRI = "0"
+ICONIFIED_ICON_ALPHA = "100"
+ICONIFIED_ICON_SAT = "0"
+ICONIFIED_ICON_BRI = "0"
 CLOCK_FMT_1 = "%H:%M"
 CLOCK_FMT_2 = "%a %d %b"
 CLOCK_PADDING_X = "0"
@@ -693,6 +702,28 @@ class TintWizardGUI(gtk.Window):
 		self.taskActiveBg.set_active(0)
 		self.taskActiveBg.connect("changed", self.changeOccurred)
 		self.tableTask.attach(self.taskActiveBg, 1, 2, 7, 8, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Task Urgent Background ID")
+		temp.set_alignment(0, 0.5)
+		self.tableTask.attach(temp, 0, 1, 8, 9, xpadding=10)
+		self.taskUrgentBg = gtk.combo_box_new_text()
+		self.taskUrgentBg.append_text("0 (fully transparent)")
+		for i in range(len(self.bgs)):
+			self.taskUrgentBg.append_text(str(i+1))
+		self.taskUrgentBg.set_active(0)
+		self.taskUrgentBg.connect("changed", self.changeOccurred)
+		self.tableTask.attach(self.taskUrgentBg, 1, 2, 8, 9, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		temp = gtk.Label("Task Iconified Background ID")
+		temp.set_alignment(0, 0.5)
+		self.tableTask.attach(temp, 0, 1, 9, 10, xpadding=10)
+		self.taskIconifiedBg = gtk.combo_box_new_text()
+		self.taskIconifiedBg.append_text("0 (fully transparent)")
+		for i in range(len(self.bgs)):
+			self.taskIconifiedBg.append_text(str(i+1))
+		self.taskIconifiedBg.set_active(0)
+		self.taskIconifiedBg.connect("changed", self.changeOccurred)
+		self.tableTask.attach(self.taskIconifiedBg, 1, 2, 9, 10, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		# Icon Options
 		self.tableIcon = gtk.Table(rows=7, columns=3, homogeneous=False)
@@ -1362,6 +1393,8 @@ class TintWizardGUI(gtk.Window):
 			"task_padding": (self.taskPadX, self.taskPadY),
 			"task_background_id": self.taskBg,
 			"task_active_background_id": self.taskActiveBg,
+			"task_urgent_background_id": self.taskUrgentBg,
+			"task_iconified_background_id": self.taskIconifiedBg,
 			"task_font": self.fontButton,
 			"task_font_color": (self.fontCol, self.fontColButton),
 			"task_active_font_color": (self.fontActiveCol, self.fontActiveColButton),
@@ -1740,6 +1773,8 @@ class TintWizardGUI(gtk.Window):
 															self.taskPadY.get_text() if self.taskPadY.get_text() else TASK_PADDING_Y))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_background_id = %s\n" % (self.taskBg.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_active_background_id = %s\n" % (self.taskActiveBg.get_active()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_urgent_background_id = %s\n" % (self.taskUrgentBg.get_active()))
+		self.configBuf.insert(self.configBuf.get_end_iter(), "task_iconified_background_id = %s\n" % (self.taskIconifiedBg.get_active()))
 		self.configBuf.insert(self.configBuf.get_end_iter(), "task_icon_asb = %s %s %s\n" % (self.iconHue.get_text() if self.iconHue.get_text() else ICON_ALPHA,
 															self.iconSat.get_text() if self.iconSat.get_text() else ICON_SAT,
 															self.iconBri.get_text() if self.iconBri.get_text() else ICON_BRI))
@@ -1948,6 +1983,8 @@ class TintWizardGUI(gtk.Window):
 		self.taskPadY.set_text(TASK_PADDING_Y)
 		self.taskBg.set_active(0)
 		self.taskActiveBg.set_active(0)
+		self.taskUrgentBg.set_active(0)
+		self.taskIconifiedBg.set_active(0)
 		# Icons
 		self.iconHue.set_text(ICON_ALPHA)
 		self.iconSat.set_text(ICON_SAT)
@@ -2373,7 +2410,7 @@ class TintWizardGUI(gtk.Window):
 
 	def updateComboBoxes(self, i, action="add"):
 		"""Updates the contents of a combo box when a background style has been added/removed."""
-		cbs = [self.batteryBg, self.clockBg, self.taskbarBg, self.taskbarActiveBg, self.trayBg, self.taskActiveBg, self.taskBg, self.panelBg, self.tooltipBg]
+		cbs = [self.batteryBg, self.clockBg, self.taskbarBg, self.taskbarActiveBg, self.trayBg, self.taskActiveBg, self.taskBg, self.panelBg, self.tooltipBg, self.taskUrgentBg, self.taskIconifiedBg]
 
 		if action == "add":
 			for cb in cbs:
