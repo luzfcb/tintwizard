@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "SVN r170"
+VERSION = "SVN r171"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -535,8 +535,8 @@ class TintWizardGUI(gtk.Window):
 		temp = gtk.Label("Autohide Strut Policy")
 		temp.set_alignment(0, 0.5)
 		self.tablePanelSettings.attach(temp, 0, 1, 7, 8, xpadding=10)
-		self.panelAutohideStrut = gtk.Entry(6)
-		self.panelAutohideStrut.set_width_chars(8)
+		self.panelAutohideStrut = gtk.Entry(12)
+		self.panelAutohideStrut.set_width_chars(20)
 		self.panelAutohideStrut.set_text(PANEL_AUTOHIDE_STRUT)
 		self.panelAutohideStrut.connect("changed", self.changeOccurred)
 		self.tablePanelSettings.attach(self.panelAutohideStrut, 1, 2, 7, 8, xoptions=gtk.EXPAND)
