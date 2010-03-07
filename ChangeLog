@@ -1,3 +1,6 @@
+7th March 2010 - Euan Freeman
+  - Added 'battery_hide' option.
+  
 6th March 2010 - Euan Freeman
   - Added panel autohide options.
   - Added 'next_task' and 'prev_task' to mouse actions.
@@ -7,7 +10,7 @@
   - Added 'panel_layer' and 'strut_policy' options.
   - Added systray icon ASB and systray maximum icon size.
   - Cleaned up code.
-  - Prepared for release tintwizard 0.3 release.
+  - Prepared for tintwizard 0.3 release.
 
 3rd november 2009 - thierry lorthiois
   - call tintwizard with config file parameter.
