@@ -367,14 +367,8 @@ class TintWizardGUI(gtk.Window):
 		self.bgs = []
 
 		# Add buttons for adding/deleting background styles
-		temp = gtk.Button("New Background", gtk.STOCK_NEW)
-		temp.set_name("addBg")
-		temp.connect("clicked", self.addBgClick)
-		self.tableBgs.attach(temp, 0, 1, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-		temp = gtk.Button("Delete Background", gtk.STOCK_DELETE)
-		temp.set_name("delBg")
-		temp.connect("clicked", self.delBgClick)
-		self.tableBgs.attach(temp, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		createButton(self.tableBgs, text="New Background", stock=gtk.STOCK_NEW, name="addBg", gridX=0, gridY=1, xExpand=True, yExpand=True, handler=self.addBgClick)
+		createButton(self.tableBgs, text="Delete Background", stock=gtk.STOCK_DELETE, name="delBg", gridX=1, gridY=1, xExpand=True, yExpand=True, handler=self.delBgClick)
 
 		# Panel Display
 		self.tablePanelDisplay = gtk.Table(rows=6, columns=3, homogeneous=False)
@@ -2361,6 +2355,7 @@ def createComboBox(parent, choices=["null"], active=0, gridX=0, gridY=0, sizeX=1
 	return temp
 
 def createEntry(parent, maxSize, width, text="", gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None):
+	"""Creates a text entry widget and adds it to a parent widget."""
 	temp = gtk.Entry(maxSize)
 	temp.set_width_chars(width)
 	temp.set_text(text)
@@ -2373,9 +2368,24 @@ def createEntry(parent, maxSize, width, text="", gridX=0, gridY=0, sizeX=1, size
 	return temp
 
 def createCheckButton(parent, text="", active=False, gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None):
+	"""Creates a checkbox widget and adds it to a parent widget."""
 	temp = gtk.CheckButton(text if text != "" else None)
 	temp.set_active(active)
 	temp.connect("toggled", handler)
+	
+	parent.attach(temp, gridX, gridX+sizeX, gridY, gridY+sizeY, xoptions=gtk.EXPAND if xExpand else 0, yoptions=gtk.EXPAND if yExpand else 0)
+	
+	return temp
+
+def createButton(parent, text="", stock=None, name="", gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None):
+	"""Creates a button widget and adds it to a parent widget."""
+	if stock:
+		temp = gtk.Button(text, stock)
+	else:
+		temp = gtk.Button(text)
+	
+	temp.set_name(name)
+	temp.connect("clicked", handler)
 	
 	parent.attach(temp, gridX, gridX+sizeX, gridY, gridY+sizeY, xoptions=gtk.EXPAND if xExpand else 0, yoptions=gtk.EXPAND if yExpand else 0)
 	
