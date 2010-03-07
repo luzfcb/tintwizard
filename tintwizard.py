@@ -115,8 +115,6 @@ class TintWizardPrefGUI(gtk.Window):
 		self.table.set_row_spacings(5)
 		self.table.set_col_spacings(5)
 		
-		# createLabel(parent, text="", gridX=0, gridY=0, sizeX=1, sizeY=1)
-		
 		createLabel(self.table, text="Default Font", gridX=0, gridY=0)
 		self.font = gtk.FontButton(self.tw.defaults["font"])
 		self.font.set_alignment(0, 0.5)
@@ -138,10 +136,7 @@ class TintWizardPrefGUI(gtk.Window):
 		self.table.attach(self.borderColor, 1, 2, 3, 4, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		createLabel(self.table, text="Number of background styles", gridX=0, gridY=4)
-		self.bgCount = gtk.Entry(6)
-		self.bgCount.set_width_chars(8)
-		self.bgCount.set_text(str(self.tw.defaults["bgCount"]))
-		self.table.attach(self.bgCount, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.bgCount = createEntry(self.table, maxSize=6, width=8, text=str(self.tw.defaults["bgCount"]), gridX=1, gridY=4, xExpand=True, yExpand=True)
 
 		createLabel(self.table, text="Default Directory", gridX=0, gridY=5)
 		self.dir = gtk.Button(self.tw.defaults["dir"])
@@ -149,16 +144,10 @@ class TintWizardPrefGUI(gtk.Window):
 		self.table.attach(self.dir, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
 
 		self.layout.attach(self.table, 0, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND, xpadding=20, ypadding=5)
-
-		temp = gtk.Button("Save", gtk.STOCK_SAVE)
-		temp.set_name("save")
-		temp.connect("clicked", self.save)
-		self.layout.attach(temp, 0, 1, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND, ypadding=20)
-		temp = gtk.Button("Cancel", gtk.STOCK_CANCEL)
-		temp.set_name("cancel")
-		temp.connect("clicked", self.quit)
-		self.layout.attach(temp, 1, 2, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND, ypadding=20)
-
+		
+		createButton(self.layout, text="Save", stock=gtk.STOCK_SAVE, name="save", gridX=0, gridY=1, xExpand=True, yExpand=True, handler=self.save)
+		createButton(self.layout, text="Cancel", stock=gtk.STOCK_CANCEL, name="cancel", gridX=1, gridY=1, xExpand=True, yExpand=True, handler=self.quit)
+		
 		self.add(self.layout)
 
 		self.show_all()
@@ -478,10 +467,8 @@ class TintWizardGUI(gtk.Window):
 
 		if self.defaults["font"] in [None, "None"]:						# If there was no font specified in the config file
 			self.defaults["font"] = self.fontButton.get_font_name()		# Use the gtk default
-
-		self.fontButton.set_font_name(self.defaults["font"])
-		self.fontButton.connect("font-set", self.changeOccurred)
-		self.tableTask.attach(self.fontButton, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		self.fontButton = createFontButton(self.tableTask, font=self.defaults["font"], gridX=1, gridY=4, handler=self.changeOccurred)
 		
 		createLabel(self.tableTask, text="Show Font Shadow", gridX=0, gridY=5, xPadding=10)
 		self.fontShadowCheckButton = createCheckButton(self.tableTask, active=False, gridX=1, gridY=5, xExpand=True, yExpand=False, handler=self.changeOccurred)
@@ -517,16 +504,9 @@ class TintWizardGUI(gtk.Window):
 		self.iconBri = createEntry(self.tableTaskDefault, maxSize=6, width=8, text=ICON_BRI, gridX=1, gridY=4, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		
 		createLabel(self.tableTaskDefault, text="Normal Font Color", gridX=0, gridY=5, xPadding=10)
-		self.fontCol = gtk.Entry(7)
-		self.fontCol.set_width_chars(9)
-		self.fontCol.set_name("fontCol")
+		self.fontCol = createEntry(self.tableTaskDefault, maxSize=7, width=9, text="", gridX=1, gridY=5, xExpand=True, yExpand=False, handler=None, name="fontCol")
 		self.fontCol.connect("activate", self.colorTyped)
-		self.tableTaskDefault.attach(self.fontCol, 1, 2, 5, 6, xoptions=gtk.EXPAND)
-		self.fontColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.fontColButton.set_use_alpha(True)
-		self.fontColButton.set_name("fontCol")
-		self.fontColButton.connect("color-set", self.colorChange)
-		self.tableTaskDefault.attach(self.fontColButton, 2, 3, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.fontColButton = createColorButton(self.tableTaskDefault, color=self.defaults["fgColor"], useAlpha=True, name="fontCol", gridX=2, gridY=5, handler=self.colorChange)
 		self.fontCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.fontCol.connect("changed", self.changeOccurred)
@@ -551,16 +531,9 @@ class TintWizardGUI(gtk.Window):
 		self.activeIconBri = createEntry(self.tableTaskActive, maxSize=6, width=8, text=ACTIVE_ICON_BRI, gridX=1, gridY=4, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		
 		createLabel(self.tableTaskActive, text="Active Font Color", gridX=0, gridY=5, xPadding=10)
-		self.fontActiveCol = gtk.Entry(7)
-		self.fontActiveCol.set_width_chars(9)
-		self.fontActiveCol.set_name("fontActiveCol")
+		self.fontActiveCol = createEntry(self.tableTaskActive, maxSize=7, width=9, text="", gridX=1, gridY=5, xExpand=True, yExpand=False, handler=None, name="fontActiveCol")
 		self.fontActiveCol.connect("activate", self.colorTyped)
-		self.tableTaskActive.attach(self.fontActiveCol, 1, 2, 5, 6, xoptions=gtk.EXPAND)
-		self.fontActiveColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.fontActiveColButton.set_use_alpha(True)
-		self.fontActiveColButton.set_name("fontActiveCol")
-		self.fontActiveColButton.connect("color-set", self.colorChange)
-		self.tableTaskActive.attach(self.fontActiveColButton, 2, 3, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.fontActiveColButton = createColorButton(self.tableTaskActive, color=self.defaults["fgColor"], useAlpha=True, name="fontActiveCol", gridX=2, gridY=5, handler=self.colorChange)
 		self.fontActiveCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.fontActiveCol.connect("changed", self.changeOccurred)
@@ -585,16 +558,9 @@ class TintWizardGUI(gtk.Window):
 		self.urgentIconBri = createEntry(self.tableTaskUrgent, maxSize=6, width=8, text=URGENT_ICON_BRI, gridX=1, gridY=4, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		
 		createLabel(self.tableTaskUrgent, text="Urgent Font Color", gridX=0, gridY=5, xPadding=10)
-		self.fontUrgentCol = gtk.Entry(7)
-		self.fontUrgentCol.set_width_chars(9)
-		self.fontUrgentCol.set_name("fontUrgentCol")
+		self.fontUrgentCol = createEntry(self.tableTaskUrgent, maxSize=7, width=9, text="", gridX=1, gridY=5, xExpand=True, yExpand=False, handler=None, name="fontUrgentCol")
 		self.fontUrgentCol.connect("activate", self.colorTyped)
-		self.tableTaskUrgent.attach(self.fontUrgentCol, 1, 2, 5, 6, xoptions=gtk.EXPAND)
-		self.fontUrgentColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.fontUrgentColButton.set_use_alpha(True)
-		self.fontUrgentColButton.set_name("fontUrgentCol")
-		self.fontUrgentColButton.connect("color-set", self.colorChange)
-		self.tableTaskUrgent.attach(self.fontUrgentColButton, 2, 3, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.fontUrgentColButton = createColorButton(self.tableTaskUrgent, color=self.defaults["fgColor"], useAlpha=True, name="fontUrgentCol", gridX=2, gridY=5, handler=self.colorChange)
 		self.fontUrgentCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.fontUrgentCol.connect("changed", self.changeOccurred)
@@ -619,16 +585,9 @@ class TintWizardGUI(gtk.Window):
 		self.iconifiedIconBri = createEntry(self.tableTaskIconified, maxSize=6, width=8, text=ICONIFIED_ICON_BRI, gridX=1, gridY=4, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		
 		createLabel(self.tableTaskIconified, text="Iconified Font Color", gridX=0, gridY=5, xPadding=10)
-		self.fontIconifiedCol = gtk.Entry(7)
-		self.fontIconifiedCol.set_width_chars(9)
-		self.fontIconifiedCol.set_name("fontIconifiedCol")
+		self.fontIconifiedCol = createEntry(self.tableTaskIconified, maxSize=7, width=9, text="", gridX=1, gridY=5, xExpand=True, yExpand=False, handler=None, name="fontIconifiedCol")
 		self.fontIconifiedCol.connect("activate", self.colorTyped)
-		self.tableTaskIconified.attach(self.fontIconifiedCol, 1, 2, 5, 6, xoptions=gtk.EXPAND)
-		self.fontIconifiedColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.fontIconifiedColButton.set_use_alpha(True)
-		self.fontIconifiedColButton.set_name("fontIconifiedCol")
-		self.fontIconifiedColButton.connect("color-set", self.colorChange)
-		self.tableTaskIconified.attach(self.fontIconifiedColButton, 2, 3, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.fontIconifiedColButton = createColorButton(self.tableTaskIconified, color=self.defaults["fgColor"], useAlpha=True, name="fontIconifiedCol", gridX=2, gridY=5, handler=self.colorChange)
 		self.fontIconifiedCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.fontIconifiedCol.connect("changed", self.changeOccurred)
@@ -679,20 +638,14 @@ class TintWizardGUI(gtk.Window):
 		self.clock1CheckButton = createCheckButton(self.tableClockDisplays, text="Show", active=True, gridX=2, gridY=1, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		
 		createLabel(self.tableClockDisplays, text="Time 1 Font", gridX=0, gridY=2, xPadding=10)
-		self.clock1FontButton = gtk.FontButton()
-		self.clock1FontButton.set_font_name(self.defaults["font"])
-		self.clock1FontButton.connect("font-set", self.changeOccurred)
-		self.tableClockDisplays.attach(self.clock1FontButton, 1, 2, 2, 3, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.clock1FontButton = createFontButton(self.tableClockDisplays, font=self.defaults["font"], gridX=1, gridY=2, handler=self.changeOccurred)
 		
 		createLabel(self.tableClockDisplays, text="Time 2 Format", gridX=0, gridY=3, xPadding=10)
 		self.clock2Format = createEntry(self.tableClockDisplays, maxSize=50, width=20, text=CLOCK_FMT_2, gridX=1, gridY=3, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		self.clock2CheckButton = createCheckButton(self.tableClockDisplays, text="Show", active=True, gridX=2, gridY=3, xExpand=True, yExpand=False, handler=self.changeOccurred)
 		
 		createLabel(self.tableClockDisplays, text="Time 2 Font", gridX=0, gridY=4, xPadding=10)
-		self.clock2FontButton = gtk.FontButton()
-		self.clock2FontButton.set_font_name(self.defaults["font"])
-		self.clock2FontButton.connect("font-set", self.changeOccurred)
-		self.tableClockDisplays.attach(self.clock2FontButton, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.clock2FontButton = createFontButton(self.tableClockDisplays, font=self.defaults["font"], gridX=1, gridY=4, handler=self.changeOccurred)
 		
 		createLabel(self.tableClockDisplays, text="Tooltip Format", gridX=0, gridY=5, xPadding=10)
 		self.clockTooltipFormat = createEntry(self.tableClockDisplays, maxSize=50, width=20, text=CLOCK_TOOLTIP, gridX=1, gridY=5, xExpand=True, yExpand=False, handler=self.changeOccurred)
@@ -712,16 +665,9 @@ class TintWizardGUI(gtk.Window):
 		self.tableClockSettings.set_col_spacings(5)
 		
 		createLabel(self.tableClockSettings, text="Clock Font Color", gridX=0, gridY=0, xPadding=10)
-		self.clockFontCol = gtk.Entry(7)
-		self.clockFontCol.set_width_chars(9)
-		self.clockFontCol.set_name("clockFontCol")
+		self.clockFontCol = createEntry(self.tableClockSettings, maxSize=7, width=9, text="", gridX=1, gridY=0, xExpand=True, yExpand=False, handler=None, name="clockFontCol")
 		self.clockFontCol.connect("activate", self.colorTyped)
-		self.tableClockSettings.attach(self.clockFontCol, 1, 2, 0, 1, xoptions=gtk.EXPAND)
-		self.clockFontColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.clockFontColButton.set_use_alpha(True)
-		self.clockFontColButton.set_name("clockFontCol")
-		self.clockFontColButton.connect("color-set", self.colorChange)
-		self.tableClockSettings.attach(self.clockFontColButton, 2, 3, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.clockFontColButton = createColorButton(self.tableClockSettings, color=self.defaults["fgColor"], useAlpha=True, name="clockFontCol", gridX=2, gridY=0, handler=self.colorChange)
 		self.clockFontCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.clockFontCol.connect("changed", self.changeOccurred)
@@ -773,25 +719,15 @@ class TintWizardGUI(gtk.Window):
 		self.tooltipBg = createComboBox(self.tableTooltip, ["0 (fully transparent)"] + range(1, len(self.bgs)), gridX=1, gridY=4, handler=self.changeOccurred)
 		
 		createLabel(self.tableTooltip, text="Tooltip Font", gridX=0, gridY=5, xPadding=10)
-		self.tooltipFont = gtk.FontButton()
-		self.tooltipFont.set_font_name(self.defaults["font"])
-		self.tooltipFont.connect("font-set", self.changeOccurred)
-		self.tableTooltip.attach(self.tooltipFont, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tooltipFont = createFontButton(self.tableTooltip, font=self.defaults["font"], gridX=1, gridY=5, handler=self.changeOccurred)
 		
 		createLabel(self.tableTooltip, text="Tooltip Font Color", gridX=0, gridY=6, xPadding=10)
-		self.tooltipFontCol = gtk.Entry(7)
-		self.tooltipFontCol.set_width_chars(9)
-		self.tooltipFontCol.set_name("tooltipFontCol")
+		self.tooltipFontCol = createEntry(self.tableTooltip, maxSize=7, width=9, text="", gridX=1, gridY=6, xExpand=True, yExpand=False, handler=None, name="tooltipFontCol")
 		self.tooltipFontCol.connect("activate", self.colorTyped)
-		self.tableTooltip.attach(self.tooltipFontCol, 1, 2, 6, 7, xoptions=gtk.EXPAND)
-		self.tooltipFontColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.tooltipFontColButton.set_use_alpha(True)
-		self.tooltipFontColButton.set_name("tooltipFontCol")
-		self.tooltipFontColButton.connect("color-set", self.colorChange)
-		self.tableTooltip.attach(self.tooltipFontColButton, 2, 3, 6, 7, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.tooltipFontColButton = createColorButton(self.tableTooltip, color=self.defaults["fgColor"], useAlpha=True, name="tooltipFontCol", gridX=2, gridY=6, handler=self.colorChange)
 		self.tooltipFontCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
-		self.clockFontCol.connect("changed", self.changeOccurred)
+		self.tooltipFontCol.connect("changed", self.changeOccurred)
 
 		# Mouse Options
 		self.tableMouse = gtk.Table(rows=4, columns=3, homogeneous=False)
@@ -816,99 +752,39 @@ class TintWizardGUI(gtk.Window):
 		self.tableBattery = gtk.Table(rows=8, columns=3, homogeneous=False)
 		self.tableBattery.set_row_spacings(5)
 		self.tableBattery.set_col_spacings(5)
-
-		temp = gtk.Label("Show Battery Applet")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 0, 1, xpadding=10)
-		self.batteryCheckButton = gtk.CheckButton()
-		self.batteryCheckButton.set_active(False)
-		self.batteryCheckButton.connect("toggled", self.changeOccurred)
-		self.tableBattery.attach(self.batteryCheckButton, 1, 2, 0, 1, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Battery Low Status (%)")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 1, 2, xpadding=10)
-		self.batteryLow = gtk.Entry(6)
-		self.batteryLow.set_width_chars(8)
-		self.batteryLow.set_text(BATTERY_LOW)
-		self.batteryLow.connect("changed", self.changeOccurred)
-		self.tableBattery.attach(self.batteryLow, 1, 2, 1, 2, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Battery Low Action")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 2, 3, xpadding=10)
-		self.batteryLowAction = gtk.Entry(150)
-		self.batteryLowAction.set_width_chars(32)
-		self.batteryLowAction.set_text(BATTERY_ACTION)
-		self.batteryLowAction.connect("changed", self.changeOccurred)
-		self.tableBattery.attach(self.batteryLowAction, 1, 3, 2, 3, xoptions=gtk.EXPAND)
 		
-		temp = gtk.Label("Battery Hide (0 to 100)")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 3, 4, xpadding=10)
-		self.batteryHide = gtk.Entry(6)
-		self.batteryHide.set_width_chars(8)
-		self.batteryHide.set_text(BATTERY_HIDE)
-		self.batteryHide.connect("changed", self.changeOccurred)
-		self.tableBattery.attach(self.batteryHide, 1, 2, 3, 4, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Battery 1 Font")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 4, 5, xpadding=10)
-		self.bat1FontButton = gtk.FontButton()
-		self.bat1FontButton.set_font_name(self.defaults["font"])
-		self.bat1FontButton.connect("font-set", self.changeOccurred)
-		self.tableBattery.attach(self.bat1FontButton, 1, 2, 4, 5, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Battery 2 Font")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 5, 6, xpadding=10)
-		self.bat2FontButton = gtk.FontButton()
-		self.bat2FontButton.set_font_name(self.defaults["font"])
-		self.bat2FontButton.connect("font-set", self.changeOccurred)
-		self.tableBattery.attach(self.bat2FontButton, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Battery Font Color")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 6, 7, xpadding=10)
-		self.batteryFontCol = gtk.Entry(7)
-		self.batteryFontCol.set_width_chars(9)
-		self.batteryFontCol.set_name("batteryFontCol")
+		createLabel(self.tableBattery, text="Show Battery Applet", gridX=0, gridY=0, xPadding=10)
+		self.batteryCheckButton = createCheckButton(self.tableBattery, active=False, gridX=1, gridY=0, xExpand=True, yExpand=False, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery Low Status (%)", gridX=0, gridY=1, xPadding=10)
+		self.batteryLow = createEntry(self.tableBattery, maxSize=6, width=8, text=BATTERY_LOW, gridX=1, gridY=1, xExpand=True, yExpand=False, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery Low Action", gridX=0, gridY=2, xPadding=10)
+		self.batteryLowAction = createEntry(self.tableBattery, maxSize=150, width=32, text=BATTERY_ACTION, gridX=1, gridY=2, xExpand=True, yExpand=False, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery Hide (0 to 100)", gridX=0, gridY=3, xPadding=10)
+		self.batteryHide = createEntry(self.tableBattery, maxSize=6, width=8, text=BATTERY_HIDE, gridX=1, gridY=3, xExpand=True, yExpand=False, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery 1 Font", gridX=0, gridY=4, xPadding=10)
+		self.bat1FontButton = createFontButton(self.tableBattery, font=self.defaults["font"], gridX=1, gridY=4, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery 2 Font", gridX=0, gridY=5, xPadding=10)
+		self.bat2FontButton = createFontButton(self.tableBattery, font=self.defaults["font"], gridX=1, gridY=5, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery Font Color", gridX=0, gridY=6, xPadding=10)
+		self.batteryFontCol = createEntry(self.tableBattery, maxSize=7, width=9, text="", gridX=1, gridY=6, xExpand=True, yExpand=False, handler=None, name="batteryFontCol")
 		self.batteryFontCol.connect("activate", self.colorTyped)
-		self.tableBattery.attach(self.batteryFontCol, 1, 2, 6, 7, xoptions=gtk.EXPAND)
-		self.batteryFontColButton = gtk.ColorButton(gtk.gdk.color_parse(self.defaults["fgColor"]))
-		self.batteryFontColButton.set_use_alpha(True)
-		self.batteryFontColButton.set_name("batteryFontCol")
-		self.batteryFontColButton.connect("color-set", self.colorChange)
-		self.tableBattery.attach(self.batteryFontColButton, 2, 3, 6, 7, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		self.batteryFontColButton = createColorButton(self.tableBattery, color=self.defaults["fgColor"], useAlpha=True, name="batteryFontCol", gridX=2, gridY=6, handler=self.colorChange)
 		self.batteryFontCol.set_text(self.defaults["fgColor"])
 		# Add this AFTER we set color to avoid "changed" event
 		self.batteryFontCol.connect("changed", self.changeOccurred)
-
-		temp = gtk.Label("Padding (x, y)")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 7, 8, xpadding=10)
-		self.batteryPadX = gtk.Entry(6)
-		self.batteryPadX.set_width_chars(8)
-		self.batteryPadX.set_text(BATTERY_PADDING_X)
-		self.batteryPadX.connect("changed", self.changeOccurred)
-		self.tableBattery.attach(self.batteryPadX, 1, 2, 7, 8, xoptions=gtk.EXPAND)
-		self.batteryPadY = gtk.Entry(6)
-		self.batteryPadY.set_width_chars(8)
-		self.batteryPadY.set_text(BATTERY_PADDING_Y)
-		self.batteryPadY.connect("changed", self.changeOccurred)
-		self.tableBattery.attach(self.batteryPadY, 2, 3, 7, 8, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Battery Background ID")
-		temp.set_alignment(0, 0.5)
-		self.tableBattery.attach(temp, 0, 1, 8, 9, xpadding=10)
-		self.batteryBg = gtk.combo_box_new_text()
-		self.batteryBg.append_text("0 (fully transparent)")
-		for i in range(len(self.bgs)):
-			self.batteryBg.append_text(str(i+1))
-		self.batteryBg.set_active(0)
-		self.batteryBg.connect("changed", self.changeOccurred)
-		self.tableBattery.attach(self.batteryBg, 1, 2, 8, 9, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
+		
+		createLabel(self.tableBattery, text="Padding (x, y)", gridX=0, gridY=7, xPadding=10)
+		self.batteryPadX = createEntry(self.tableBattery, maxSize=6, width=8, text=BATTERY_PADDING_X, gridX=1, gridY=7, xExpand=True, yExpand=False, handler=self.changeOccurred)
+		self.batteryPadY = createEntry(self.tableBattery, maxSize=6, width=8, text=BATTERY_PADDING_Y, gridX=2, gridY=7, xExpand=True, yExpand=False, handler=self.changeOccurred)
+		
+		createLabel(self.tableBattery, text="Battery Background ID", gridX=0, gridY=8, xPadding=10)
+		self.batteryBg = createComboBox(self.tableBattery, ["0 (fully transparent)"] + range(1, len(self.bgs)), gridX=1, gridY=8, handler=self.changeOccurred)
 
 		# View Config
 		self.configArea = gtk.ScrolledWindow()
@@ -1095,20 +971,11 @@ class TintWizardGUI(gtk.Window):
 	def addBg(self):
 		"""Adds a new background to the list of backgrounds."""
 		self.bgs += [gtk.Table(4, 3, False)]
-
-		temp = gtk.Label("Corner Rounding (px)")
-		temp.set_alignment(0, 0.5)
-		self.bgs[-1].attach(temp, 0, 1, 0, 1, xpadding=10)
-		temp = gtk.Entry(7)
-		temp.set_width_chars(9)
-		temp.set_name("rounded")
-		temp.set_text(BG_ROUNDING)
-		temp.connect("changed", self.changeOccurred)
-		self.bgs[-1].attach(temp, 1, 2, 0, 1, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Background Color")
-		temp.set_alignment(0, 0.5)
-		self.bgs[-1].attach(temp, 0, 1, 1, 2, xpadding=10)
+		
+		createLabel(self.bgs[-1], text="Corner Rounding (px)", gridX=0, gridY=0, xPadding=10)
+		createEntry(self.bgs[-1], maxSize=7, width=9, text=BG_ROUNDING, gridX=1, gridY=0, xExpand=True, yExpand=False, handler=self.changeOccurred, name="rounded")
+		
+		createLabel(self.bgs[-1], text="Background Color", gridX=0, gridY=1, xPadding=10)
 		temp = gtk.Entry(7)
 		temp.set_width_chars(9)
 		temp.set_name("bgColEntry")
@@ -1121,20 +988,11 @@ class TintWizardGUI(gtk.Window):
 		temp.set_name("bgCol")
 		temp.connect("color-set", self.colorChange)
 		self.bgs[-1].attach(temp, 2, 3, 1, 2, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Border Width (px)")
-		temp.set_alignment(0, 0.5)
-		self.bgs[-1].attach(temp, 0, 1, 2, 3, xpadding=10)
-		temp = gtk.Entry(7)
-		temp.set_width_chars(9)
-		temp.set_name("border")
-		temp.set_text(BG_BORDER)
-		temp.connect("changed", self.changeOccurred)
-		self.bgs[-1].attach(temp, 1, 2, 2, 3, xoptions=gtk.EXPAND)
-
-		temp = gtk.Label("Border Color")
-		temp.set_alignment(0, 0.5)
-		self.bgs[-1].attach(temp, 0, 1, 3, 4, xpadding=10)
+		
+		createLabel(self.bgs[-1], text="Border Width (px)", gridX=0, gridY=2, xPadding=10)
+		createEntry(self.bgs[-1], maxSize=7, width=9, text=BG_BORDER, gridX=1, gridY=2, xExpand=True, yExpand=False, handler=self.changeOccurred, name="border")
+		
+		createLabel(self.bgs[-1], text="Border Color", gridX=0, gridY=3, xPadding=10)
 		temp = gtk.Entry(7)
 		temp.set_width_chars(9)
 		temp.set_name("borderColEntry")
@@ -2212,11 +2070,12 @@ def createComboBox(parent, choices=["null"], active=0, gridX=0, gridY=0, sizeX=1
 	
 	return temp
 
-def createEntry(parent, maxSize, width, text="", gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None):
+def createEntry(parent, maxSize, width, text="", gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None, name=""):
 	"""Creates a text entry widget and adds it to a parent widget."""
 	temp = gtk.Entry(maxSize)
 	temp.set_width_chars(width)
 	temp.set_text(text)
+	temp.set_name(name)
 	
 	if handler != None:
 		temp.connect("changed", handler)
@@ -2244,6 +2103,26 @@ def createButton(parent, text="", stock=None, name="", gridX=0, gridY=0, sizeX=1
 	
 	temp.set_name(name)
 	temp.connect("clicked", handler)
+	
+	parent.attach(temp, gridX, gridX+sizeX, gridY, gridY+sizeY, xoptions=gtk.EXPAND if xExpand else 0, yoptions=gtk.EXPAND if yExpand else 0)
+	
+	return temp
+
+def createFontButton(parent, font, gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None):
+	"""Creates a font button widget and adds it to a parent widget."""
+	temp = gtk.FontButton()
+	temp.set_font_name(font)
+	temp.connect("font-set", handler)
+	
+	parent.attach(temp, gridX, gridX+sizeX, gridY, gridY+sizeY, xoptions=gtk.EXPAND if xExpand else 0, yoptions=gtk.EXPAND if yExpand else 0)
+	
+	return temp
+
+def createColorButton(parent, color="#000000", useAlpha=True, name="", gridX=0, gridY=0, sizeX=1, sizeY=1, xExpand=True, yExpand=True, handler=None):
+	temp = gtk.ColorButton(gtk.gdk.color_parse(color))
+	temp.set_use_alpha(useAlpha)
+	temp.set_name(name)
+	temp.connect("color-set", handler)
 	
 	parent.attach(temp, gridX, gridX+sizeX, gridY, gridY+sizeY, xoptions=gtk.EXPAND if xExpand else 0, yoptions=gtk.EXPAND if yExpand else 0)
 	
