@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #*************************************************************************/
-# Last modified: 13th March 2010
+# Last modified: 6th April 2010
 
 import pygtk
 pygtk.require('2.0')
@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.3.2"
+VERSION = "0.3.3"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -138,11 +138,6 @@ class TintWizardPrefGUI(gtk.Window):
 		createLabel(self.table, text="Number of background styles", gridX=0, gridY=4)
 		self.bgCount = createEntry(self.table, maxSize=6, width=8, text=str(self.tw.defaults["bgCount"]), gridX=1, gridY=4, xExpand=True, yExpand=True)
 
-		createLabel(self.table, text="Default Directory", gridX=0, gridY=5)
-		self.dir = gtk.Button(self.tw.defaults["dir"])
-		self.dir.connect("clicked", self.chooseFolder)
-		self.table.attach(self.dir, 1, 2, 5, 6, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND)
-
 		self.layout.attach(self.table, 0, 2, 0, 1, xoptions=gtk.EXPAND, yoptions=gtk.EXPAND, xpadding=20, ypadding=5)
 		
 		createButton(self.layout, text="Save", stock=gtk.STOCK_SAVE, name="save", gridX=0, gridY=1, xExpand=True, yExpand=True, handler=self.save)
@@ -151,26 +146,6 @@ class TintWizardPrefGUI(gtk.Window):
 		self.add(self.layout)
 
 		self.show_all()
-
-	def chooseFolder(self, widget=None, direction=None):
-		"""Called every time the folder button is clicked. Shows a file chooser."""
-		chooser = gtk.FileChooserDialog("Choose Default Folder", self, gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
-		chooser.set_default_response(gtk.RESPONSE_OK)
-
-		if self.tw.curDir != None:
-			chooser.set_current_folder(self.tw.curDir)
-
-		chooser.show()
-
-		response = chooser.run()
-
-		if response == gtk.RESPONSE_OK:
-			self.dir.set_label(chooser.get_filename())
-		else:
-			chooser.destroy()
-			return
-
-		chooser.destroy()
 
 	def quit(self, widget=None, event=None):
 		"""Destroys the window."""
@@ -189,9 +164,6 @@ class TintWizardPrefGUI(gtk.Window):
 			except:
 				errorDialog(self, "Invalid value for background count")
 				return
-
-			self.tw.defaults["dir"] = self.dir.get_label()
-			self.curDir = self.tw.defaults["dir"]
 
 			self.tw.writeConf()
 
@@ -223,19 +195,11 @@ class TintWizardGUI(gtk.Window):
 		if self.defaults["borderColor"] in [None, "None"]:
 			self.defaults["borderColor"] = "#ffffff"
 
-		if self.defaults["dir"] in [None, "None"]:
-			if os.path.exists(os.path.expandvars("${HOME}") + "/.config/tint2"):
-				self.curDir = os.path.expandvars("${HOME}") + "/.config/tint2"
-			else:
-				self.curDir = None
+		if os.path.exists(os.path.expandvars("${HOME}") + "/.config/tint2"):
+			self.curDir = os.path.expandvars("${HOME}") + "/.config/tint2"
 		else:
-			self.curDir = os.path.expandvars(self.defaults["dir"])
-
-			if not os.path.exists(os.path.expandvars(self.curDir)):
-				if os.path.exists(os.path.expandvars("${HOME}") + "/.config/tint2"):
-					self.curDir = os.path.expandvars("${HOME}") + "/.config/tint2"
-				else:
-					self.curDir = None
+			errorDialog("$HOME/.config/tint2/ directory not found! Is tint2 installed correctly?")
+			Sys.exit(1)
 
 		try:
 			self.defaults["bgCount"] = int(self.defaults["bgCount"])
@@ -1756,16 +1720,13 @@ class TintWizardGUI(gtk.Window):
 
 	def readConf(self):
 		"""Reads the tintwizard configuration file - NOT tint2 config files."""
-		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None, "dir": None}
+		self.defaults = {"font": None, "bgColor": None, "fgColor": None, "borderColor": None, "bgCount": None}
 
 		if self.oneConfigFile:
 			# don't need tintwizard.conf
 			return
 
-		pathName = os.path.dirname(sys.argv[0])
-
-		if pathName != "":
-			pathName += "/"
+		pathName = os.path.expandvars("${HOME}") + "/.config/tint2/"
 
 		if not os.path.exists(pathName + "tintwizard.conf"):
 			self.writeConf()
@@ -2088,18 +2049,15 @@ class TintWizardGUI(gtk.Window):
 
 		for key in self.defaults:
 			confStr += "%s = %s\n" % (key, str(self.defaults[key]))
-
+		
 		confStr += "#End\n"
-
-		pathName = os.path.dirname(sys.argv[0])
-
-		if pathName == "":
-			f = open("tintwizard.conf", "w")
-		else:
-			f = open(pathName+"/tintwizard.conf", "w")
-
+		
+		pathName = os.path.expandvars("${HOME}") + "/.config/tint2/"
+		
+		f = open(pathName+"tintwizard.conf", "w")
+		
 		f.write(confStr)
-
+		
 		f.close()
 
 	def writeFile(self):
