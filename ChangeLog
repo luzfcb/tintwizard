@@ -1,3 +1,6 @@
+21st April 2010
+  - Fixed bug where applying config crashes tint2.
+
 6th April 2010 - Euan Freeman
   - Moved the tintwizard.conf file to the tint2 directory by default.
   - Removed dir option from tintwizard.conf; just use the tint2 directory for everything.

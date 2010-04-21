@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #*************************************************************************/
-# Last modified: 6th April 2010
+# Last modified: 21st April 2010
 
 import pygtk
 pygtk.require('2.0')
@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.3.3"
+VERSION = "0.3.3b"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -1144,7 +1144,7 @@ class TintWizardGUI(gtk.Window):
 					os.kill(pid, signal.SIGTERM)
 
 				# Lastly, start it
-				os.spawnv(os.P_NOWAIT, self.tint2Bin, [self.tint2Bin, "-c" + self.filename])
+				os.spawnv(os.P_NOWAIT, self.tint2Bin, [self.tint2Bin, "-c", self.filename])
 
 				if confirmChange and self.filename != (os.path.expandvars("${HOME}") + "/.config/tint2/tint2rc") and confirmDialog(self, "Use this as default tint2 config?") == gtk.RESPONSE_YES:
 					tmp = self.filename
