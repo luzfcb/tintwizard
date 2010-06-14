@@ -1,3 +1,6 @@
+14th June 2010
+  - Changed from using pidof to pgrep, to find process id of tint2.
+
 21st April 2010
   - Fixed bug where applying config crashes tint2.
 

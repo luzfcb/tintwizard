@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #*************************************************************************/
-# Last modified: 21st April 2010
+# Last modified: 14th June 2010
 
 import pygtk
 pygtk.require('2.0')
@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.3.3b"
+VERSION = "0.3.4"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -1112,7 +1112,7 @@ class TintWizardGUI(gtk.Window):
 	def apply(self, widget, event=None, confirmChange=True):
 		"""Applies the current config to tint2."""
 		# Check if tint2 is running
-		procs = os.popen('pidof "tint2"')				# Check list of active processes for tint2
+		procs = os.popen('pgrep -x "tint2"')			# Check list of active processes for tint2
 		pids = []										# List of process ids for tint2
 
 		for proc in procs.readlines():
