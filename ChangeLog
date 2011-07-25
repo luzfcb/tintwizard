@@ -1,3 +1,6 @@
+25th July 2011
+  - Fixed https://bugzilla.redhat.com/show_bug.cgi?id=719768
+
 14th June 2010
   - Changed from using pidof to pgrep, to find process id of tint2.
 

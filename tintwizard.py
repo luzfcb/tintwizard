@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #*************************************************************************/
-# Last modified: 14th June 2010
+# Last modified: 25th July 2011
 
 import pygtk
 pygtk.require('2.0')
@@ -32,7 +32,7 @@ import shutil
 # Project information
 NAME = "tintwizard"
 AUTHORS = ["Euan Freeman <euan04@gmail.com>"]
-VERSION = "0.3.4"
+VERSION = "0.3.5"
 COMMENTS = "tintwizard generates config files for the lightweight panel replacement tint2"
 WEBSITE = "http://code.google.com/p/tintwizard/"
 
@@ -997,14 +997,14 @@ class TintWizardGUI(gtk.Window):
 		gtk.about_dialog_set_url_hook(self.aboutLinkCallback)
 		about.run()
 		about.destroy()
-
-	def aboutLinkCallback(dialog, link, data=None):
+		
+	def aboutLinkCallback(self, dialog, link, data=None):
 		"""Callback for when a URL is clicked in an About dialog."""
 		try:
 			webbrowser.open(link)
 		except:
-			errorDialog(self, "Your default web-browser could not be opened.\nPlease visit %s" % link)
-
+			errorDialog(self, message = "Your default web-browser could not be opened.\nPlease visit %s" % (link,))
+		
 	def addBg(self):
 		"""Adds a new background to the list of backgrounds."""
 		self.bgs += [gtk.Table(4, 3, False)]
@@ -2160,7 +2160,7 @@ def createColorButton(parent, color="#000000", useAlpha=True, name="", gridX=0, 
 	
 	return temp
 
-def confirmDialog(parent, message):
+def confirmDialog(parent=None, message="Confirm?"):
 	"""Creates a confirmation dialog and returns the response."""
 	dialog = gtk.MessageDialog(parent, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, message)
 	dialog.show()
