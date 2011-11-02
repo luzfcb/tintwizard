@@ -1652,7 +1652,7 @@ class TintWizardGUI(gtk.Window):
 				self.clockTimezone2CheckButton.set_active(True)
 			elif propType == "tooltip_timezone":
 				self.clockTimezoneTooltipCheckButton.set_active(True)
-			elif propType == "tray":
+			elif propType == "systray":
 				self.trayShow.set_active(True)
 			elif propType == "activeBg":
 				self.taskbarActiveBgEnable.set_active(True)
